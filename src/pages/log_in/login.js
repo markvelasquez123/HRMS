@@ -57,8 +57,8 @@ const LoginPage = () => {
 
     try {
       const endpoint = isSignUp
-        ? "http://localhost/QMS-ASIANAVIS/backend/signup.php"
-        : "http://localhost/QMS-ASIANAVIS/backend/login.php";
+        ? "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/signup.php"
+        : "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/login.php";
 
       const body = isSignUp
         ? {

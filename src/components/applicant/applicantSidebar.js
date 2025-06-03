@@ -26,7 +26,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('http://localhost/QMS-ASIANAVIS/backend/get_applicants.php', {
+        const res = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/get_applicants.php', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
@@ -91,7 +91,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
       console.log('Sending pool data:', poolData);
 
-      const response = await fetch('http://localhost/QMS-ASIANAVIS/backend/pool.php', {
+      const response = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/pool.php', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
       console.log('Sending data:', employeeData);
 
-      const response = await fetch('http://localhost/QMS-ASIANAVIS/backend/accept_applicant.php', {
+      const response = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/accept_applicant.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -288,7 +288,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
     if (applicant?.avatar) {
       const avatarUrl = applicant.avatar.startsWith('http') 
         ? applicant.avatar 
-        : `http://localhost/QMS-ASIANAVIS/backend/${applicant.avatar}`;
+        : `http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/${applicant.avatar}`;
       
       return (
         <div className="flex justify-center">

@@ -28,7 +28,7 @@ export default function ApplicantCharts() {
   // Function to fetch employees from your employee.php backend
   const fetchEmployeesFromBackend = async () => {
     try {
-      const response = await fetch('http://localhost/QMS-ASIANAVIS/backend/employee.php?action=get');
+      const response = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/employee.php?action=get');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -120,7 +120,7 @@ export default function ApplicantCharts() {
     setError("");
     try {
       const response = await fetch(
-        "http://localhost/QMS-ASIANAVIS/backend/get_pool_data.php",
+        "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/get_pool_data.php",
         {
           method: 'GET',
           headers: { "Content-Type": "application/json" },

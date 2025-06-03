@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaEye, FaUser } from "react-icons/fa";
 import ApplicantSidebar from "../../components/applicant/applicantSidebar";
 
-const API_URL = "http://localhost/QMS-ASIANAVIS/backend/get_applicants.php";
+const API_URL = "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/get_applicants.php";
 
 const ApplicantPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,7 +111,7 @@ const ApplicantPage = () => {
     if (applicant?.avatar && applicant.avatar.trim() !== '') {
       const avatarUrl = applicant.avatar.startsWith('http') 
         ? applicant.avatar 
-        : `http://localhost/QMS-ASIANAVIS/backend/${applicant.avatar}`;
+        : `http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/${applicant.avatar}`;
       
       return (
         <div className="relative">

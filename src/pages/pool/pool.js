@@ -28,7 +28,7 @@ const Pool = () => {
     try {
       // Updated API endpoint to match your PHP backend structure
       const response = await axios.get(
-        "http://localhost/QMS-ASIANAVIS/backend/get_pool_data.php",
+        "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/get_pool_data.php",
         {
           headers: {
             "Content-Type": "application/json",

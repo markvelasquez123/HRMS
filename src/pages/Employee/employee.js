@@ -46,7 +46,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
 
   const getAvatarDisplay = () => {
     if (employee?.ProfilePicture) {
-      return <img src={`http://localhost/QMS-ASIANAVIS/backend/uploads/${employee.ProfilePicture}`} alt={`${employee.FirstName} ${employee.LastName}`} className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto" />;
+      return <img src={`http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/uploads/${employee.ProfilePicture}`} alt={`${employee.FirstName} ${employee.LastName}`} className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto" />;
     }
     return (
       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-4 ring-gray-100 mx-auto">
@@ -123,7 +123,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><FileText className="w-4 h-4 mr-2" />Documents</h4>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <a href={`http://localhost/QMS-ASIANAVIS/backend/uploads/${employee.ResumeFile}`} target="_blank" rel="noopener noreferrer"
+                  <a href={`http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/uploads/${employee.ResumeFile}`} target="_blank" rel="noopener noreferrer"
                     className="flex items-center text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
                     <FileText className="w-4 h-4 mr-2 flex-shrink-0" />View Resume
                   </a>
@@ -160,7 +160,7 @@ const EmployeePage = () => {
 
   const loadEmployees = async () => {
     try {
-      const response = await fetch('http://localhost/QMS-ASIANAVIS/backend/employee.php?action=get');
+      const response = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/employee.php?action=get');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
@@ -262,7 +262,7 @@ const EmployeePage = () => {
     });
     
     try {
-      const response = await fetch("http://localhost/QMS-ASIANAVIS/backend/employee.php", {
+      const response = await fetch("http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/employee.php", {
         method: 'POST',
         body: submitFormData
       });
@@ -484,7 +484,7 @@ const EmployeePage = () => {
               {filteredEmployees.map((employee, index) => (
                 <tr key={employee.id || index} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4">
-                    <img src={employee.ProfilePicture ? `http://localhost/QMS-ASIANAVIS/backend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
+                    <img src={employee.ProfilePicture ? `http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
                       alt={`${employee.FirstName} ${employee.LastName}`} className="h-12 w-12 rounded-full object-cover border-2 border-gray-200" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{employee.idNumber}</div></td>
