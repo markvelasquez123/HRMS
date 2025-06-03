@@ -1,0 +1,58 @@
+/* Icon styles */
+.sidebar ul li i {
+    color: #4B5563;
+    transition: all 0.3s ease-in-out;
+    padding: 8px;
+}
+
+/* Label styles */
+.sidebar label {
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+}
+
+.sidebar:hover label {
+    opacity: 1;
+}
+
+/* Text styles */
+.sidebar ul li span {
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap;
+}
+
+/* Hover effects */
+.sidebar ul li:hover i {
+    color: #2563EB;
+    transform: scale(1.1);
+}
+
+/* Expanded state */
+.sidebar.w-44 ul li span {
+    opacity: 1;
+}
+
+/* Active link styles */
+.sidebar ul li a.active {
+    background-color: #EFF6FF;
+    color: #2563EB;
+}
+
+.sidebar ul li a.active i {
+    color: #2563EB;
+}
+
+/* Logo hover effect */
+.sidebar img {
+    transition: all 0.3s ease-in-out;
+}
+
+.sidebar img:hover {
+    opacity: 0.9;
+}
+
+/* Smooth transitions */
+.sidebar * {
+    transition: all 0.3s ease-in-out;
+}
