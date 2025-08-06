@@ -46,7 +46,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
 
   const getAvatarDisplay = () => {
     if (employee?.ProfilePicture) {
-      return <img src={`http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/uploads/${employee.ProfilePicture}`} alt={`${employee.FirstName} ${employee.LastName}`} className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto" />;
+      return <img src={`http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}`} alt={`${employee.FirstName} ${employee.LastName}`} className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto" />;
     }
     return (
       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-4 ring-gray-100 mx-auto">
@@ -123,7 +123,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><FileText className="w-4 h-4 mr-2" />Documents</h4>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <a href={`http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/uploads/${employee.ResumeFile}`} target="_blank" rel="noopener noreferrer"
+                  <a href={`http://localhost/HRMSbackend/uploads/${employee.ResumeFile}`} target="_blank" rel="noopener noreferrer"
                     className="flex items-center text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
                     <FileText className="w-4 h-4 mr-2 flex-shrink-0" />View Resume
                   </a>
@@ -160,7 +160,7 @@ const EmployeePage = () => {
 
   const loadEmployees = async () => {
     try {
-      const response = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/employee.php?action=get');
+      const response = await fetch('http://localhost/HRMSbackend/employee.php?action=get');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
@@ -262,7 +262,7 @@ const EmployeePage = () => {
     });
     
     try {
-      const response = await fetch("http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/employee.php", {
+      const response = await fetch("http://localhost/HRMSbackend/employee.php", {
         method: 'POST',
         body: submitFormData
       });
@@ -304,7 +304,8 @@ const EmployeePage = () => {
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
       idNumber: "Employee ID", firstName: "First Name", lastName: "Last Name", hireDate: "Hire Date",
-      birthDate: "Birth Date", employeeType: "Employee Type", Position: "Position", Department: "Department", salary: "Salary"
+      birthDate: "Birth Date", employeeType: "Employee Type", Position: "Position", Department: "Department", salary: "Salary",
+      accid: "Account ID",
     };
     const label = labelMap[field] || field.replace(/([A-Z])/g, " $1").trim();
     
@@ -396,6 +397,7 @@ const EmployeePage = () => {
             </div>
             <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
               onClick={() => setShowForm(true)}>
+              sessionStorage.getItem('')
               + Add Employee
             </button>
           </div>
@@ -405,7 +407,10 @@ const EmployeePage = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-2xl mx-4 sm:mx-auto overflow-y-auto max-h-[90vh]">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Add New Employee</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Add New Employee Added by;</h2>
+                <script>
+                  const accid = sessionStorage.getItem(sign.up.accid);
+                </script>
                 <button onClick={resetForm} className="text-gray-500 hover:text-gray-700 transition-colors">
                   <X className="w-6 h-6" />
                 </button>
@@ -484,7 +489,7 @@ const EmployeePage = () => {
               {filteredEmployees.map((employee, index) => (
                 <tr key={employee.id || index} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4">
-                    <img src={employee.ProfilePicture ? `http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
+                    <img src={employee.ProfilePicture ? `http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
                       alt={`${employee.FirstName} ${employee.LastName}`} className="h-12 w-12 rounded-full object-cover border-2 border-gray-200" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{employee.idNumber}</div></td>

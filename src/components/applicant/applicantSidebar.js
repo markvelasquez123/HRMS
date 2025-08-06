@@ -26,7 +26,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/get_applicants.php', {
+        const res = await fetch('http://localhost/HRMSbackend/get_applicants.php', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
@@ -91,7 +91,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
       console.log('Sending pool data:', poolData);
 
-      const response = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/pool.php', {
+      const response = await fetch('http://localhost/HRMSbackend/pool.php', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
       console.log('Sending data:', employeeData);
 
-      const response = await fetch('http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/accept_applicant.php', {
+      const response = await fetch('http://localhost/HRMSbackend/accept_applicant.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -247,8 +247,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         console.log('Successfully added to pool table');
       }
       
-      // You can add API call here to handle rejection in backend if needed
-      // For now, just update the status locally
       
       setStatus("Rejected");
       
@@ -288,7 +286,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
     if (applicant?.avatar) {
       const avatarUrl = applicant.avatar.startsWith('http') 
         ? applicant.avatar 
-        : `http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/${applicant.avatar}`;
+        : `http://localhost/HRMSbackend/${applicant.avatar}`;
       
       return (
         <div className="flex justify-center">

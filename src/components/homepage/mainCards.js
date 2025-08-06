@@ -14,7 +14,7 @@ const MainCards = () => {
         
         // Fetch employees from the backend
         const employeeResponse = await axios.get(
-          "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/employee.php?action=get",
+          "http://localhost/HRMSbackend/employee.php?action=get",
           {
             headers: {
               "Content-Type": "application/json",
@@ -33,7 +33,7 @@ const MainCards = () => {
 
         // Fetch applicants from the same endpoint as ApplicantPage.js
         const applicantResponse = await axios.get(
-          "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/get_applicants.php",
+          "http://localhost/HRMSbackend/get_applicants.php",
           {
             headers: {
               "Content-Type": "application/json",
@@ -56,7 +56,7 @@ const MainCards = () => {
 
         // Fetch pool data from the same endpoint as Pool component
         const poolResponse = await axios.get(
-          "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/get_pool_data.php",
+          "http://localhost/HRMSbackend/get_pool_data.php",
           {
             headers: {
               "Content-Type": "application/json",

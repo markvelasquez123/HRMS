@@ -25,14 +25,14 @@ const LoginPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
-
+    
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
     const trimmedCompanyId = companyId.trim();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+    
     if (
       !trimmedEmail ||
       !trimmedPassword ||
@@ -57,8 +57,8 @@ const LoginPage = () => {
 
     try {
       const endpoint = isSignUp
-        ? "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/signup.php"
-        : "http://localhost/QMS-ASIANAVIS/HRMSBACKEND/HRMSbackend/login.php";
+        ? "http://localhost/HRMSbackend/signup.php"
+        : "http://localhost/HRMSbackend/login.php";
 
       const body = isSignUp
         ? {
@@ -71,7 +71,7 @@ const LoginPage = () => {
             email: trimmedEmail,
             password: trimmedPassword,
           };
-
+      
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -84,10 +84,12 @@ const LoginPage = () => {
         if (isSignUp) {
           alert("Signup successful! Please wait for verification.");
           resetForm();
-          setIsSignUp(false); // switch to login after signup success
+          setIsSignUp(false); 
         } else {
           alert("Login successful! Redirecting...");
-          // Optionally save user info here
+          sessionStorage.setItem('userEmail', email);
+          const v = sessionStorage.getItem('userEmail');
+          alert("Log in as " + v);
           navigate("/Homepage");
         }
       } else {
@@ -96,8 +98,10 @@ const LoginPage = () => {
     } catch {
       setError("Failed to connect to server.");
     }
+    
 
     setIsLoading(false);
+    
   };
 
   const toggleMode = () => {
