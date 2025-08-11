@@ -180,7 +180,7 @@ const EmployeePage = () => {
   const resumeFileRef = useRef(null);
   const [fieldErrors, setFieldErrors] = useState({ idNumber: "", firstName: "", lastName: "", Position: "", phone: "", salary: "" });
   const [accID, setaccID] = useState();
-  const [isChecked, setIsChecked] = useState();
+  const [isChecked, setIsChecked] = useState(false);
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering"];
   const basicFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "gender", "employeeType", "salary"];
@@ -191,6 +191,7 @@ const EmployeePage = () => {
 
   function Clicked(){
     alert("ginalaw")
+    setIsChecked(prev => !prev);
     const handleChange = () => {
       setIsChecked(!isChecked);
     }
@@ -250,13 +251,17 @@ const EmployeePage = () => {
   const handleFileChange = (e) => dispatch({ type: "UPDATE_FIELD", field: "ProfilePicture", value: e.target.files[0] });
   const handleResumeFileChange = (e) => dispatch({ type: "UPDATE_FIELD", field: "ResumeFile", value: e.target.files[0] });
 
+  
   const validateFiles = () => {
     if (formData.ProfilePicture && !formData.ProfilePicture.type.startsWith('image/')) {
-      setError("Profile picture must be an image file");
       return false;
     }
-    if (formData.ResumeFile && !formData.ResumeFile.type.includes('pdf') && !formData.ResumeFile.type.includes('document') && !formData.ResumeFile.type.startsWith('image/')) {
-      setError("Resume should be a PDF or document file");
+    if (
+      formData.ResumeFile &&
+      !formData.ResumeFile.type.includes('pdf') &&
+      !formData.ResumeFile.type.includes('document') &&
+      !formData.ResumeFile.type.startsWith('image/')
+    ) {
       return false;
     }
     return true;
@@ -302,6 +307,13 @@ const EmployeePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    
+    if (!validateFiles()) {
+      setError("Profile picture must be an image file, and resume should be a PDF or document.");
+      return;
+    }
+
     if (!isFormValid()) {
       setError('Please fill in all required fields correctly');
       return;
@@ -338,6 +350,29 @@ const EmployeePage = () => {
       const result = await response.json();
       
       if (result.success) {
+        
+        if (isChecked) {
+          try {
+            const signupResp = await fetch("http://localhost/HRMSbackend/signup.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                name: `${formData.firstName} ${formData.lastName}`.trim(),
+                email: formData.email,
+                password: formData.idNumber,
+                companyId: formData.idNumber
+              })
+            });
+            const signupJson = await signupResp.json();
+            if (!signupJson.success) {
+              console.error("Signup failed:", signupJson.message);
+            }
+          } catch (signupErr) {
+            console.error("Signup request error:", signupErr);
+          }
+        }
+
         setSuccess('Employee added successfully!');
         resetForm();
         loadEmployees();
@@ -532,7 +567,7 @@ const EmployeePage = () => {
                   <button type="button" onClick={resetForm} className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                     Cancel
                   </button>
-                  <button type="submit" disabled={loading || !isFormValid()} 
+                  <button type="submit" disabled={loading} 
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleSubmit}>
                     {loading ? "Submitting..." : "Add Employee"}
