@@ -8,7 +8,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [companyId, setCompanyId] = useState("");
-  const [error, setError] = useState("");
+   const [error, setError] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,6 +36,8 @@ const LoginPage = () => {
     if (
       !trimmedEmail ||
       !trimmedPassword ||
+      
+
       (isSignUp && !trimmedCompanyId) ||
       (isSignUp && !trimmedName)
     ) {
@@ -66,6 +68,7 @@ const LoginPage = () => {
             email: trimmedEmail,
             password: trimmedPassword,
             companyId: trimmedCompanyId,
+            
           }
         : {
             email: trimmedEmail,

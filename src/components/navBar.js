@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign } from "lucide-react";
 
 const Navbar = ({ toggleSidebar }) => {
@@ -6,39 +6,106 @@ const Navbar = ({ toggleSidebar }) => {
   const [showModal, setShowModal] = useState(false);
   const [userData, setUserData] = useState({});
   const [formData, setFormData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState([]);
 
-  const handleAvatarClick = async () => {
-    const email = sessionStorage.getItem('userEmail');
-    setShowModal(true);
-    console.log("Avatar clicked, email:", email); // Debug: confirm this runs
-    if (!email) {
-      setUserData({});
-      setFormData({});
-      return;
-    }
-    try {
-      const response = await fetch("http://localhost/HRMSbackend/employee.php?action=get", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-        credentials: "include"
-      });
-      const data = await response.json();
-      if (data && !data.error && data.length > 0) {
-        setUserData(data[0]);
-        setFormData(data[0]);
-        if (data[0].ProfilePicture) {
-          setProfilePic(`http://localhost/HRMSbackend/uploads/${data[0].ProfilePicture}`);
-        }
-      } else {
-        setUserData({});
-        setFormData({});
+  
+  useEffect(() => {
+    fetchUser();
+
+  }, []);
+
+
+
+  const fetchUser = async () => {
+  const email = sessionStorage.getItem('userEmail');
+
+  if (!email) {
+    console.error("No user email found in sessionStorage.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost/HRMSbackend/employee.php?action=get", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email}),
+      credentials: "include"
+    });
+
+    const data = await response.json();
+
+    if (data && !data.error && data.length > 0) {
+      const user = data[0]; 
+      setUserData(user);
+      sessionStorage.setItem('userData', JSON.stringify(user)); 
+      sessionStorage.setItem('AccID', JSON.stringify(user.accid));
+
+      if (user.ProfilePicture) {
+        setProfilePic(`http://localhost/HRMSbackend/uploads/${user.ProfilePicture}`);
       }
-    } catch (error) {
+    } else {
       setUserData({});
-      setFormData({});
+      console.warn("No user data found for email:", email);
     }
-  };
+  } catch (error) {
+    setUserData({});
+    console.error('Fetch error:', error);
+  }
+};
+
+
+
+
+   const handleAvatarClick = async () => {
+    setShowModal(true);
+   }
+
+
+  // const handleAvatarClick = async () => {
+  //   const email = sessionStorage.getItem('userEmail');  
+  //   setShowModal(true);
+
+  //   if (!email) {
+     
+  //     FData({});
+  //     setFormData({});
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch(, {
+  //       method: "POST","http://localhost/HRMSbackend/employee.php?action=get"
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ email }),  
+  //       credentials: "include"
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (data && !data.error && data.length > 0) {
+  //       const user = data[0];  
+  //       setUserData(user);
+  //       setFormData(user);
+
+       
+  //       sessionStorage.setItem('userData', JSON.stringify(user));
+
+        
+  //       if (user.ProfilePicture) {
+  //         setProfilePic(`http://localhost/HRMSbackend/uploads/${user.ProfilePicture}`);
+  //       }
+  //     } else {
+  //       setUserData({});
+  //       setFormData({});
+  //     }
+  //   } catch (error) {
+  //     setUserData({});
+  //     setFormData({});
+  //   }
+  // };
 
   const handleClose = () => {
     setShowModal(false);
@@ -125,7 +192,7 @@ const Navbar = ({ toggleSidebar }) => {
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                   <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><Briefcase className="w-4 h-4 mr-2" />Employment Information</h4>
                   <div className="space-y-3">
-                    {[
+                    {[ 
                       { icon: IdCard, label: "Employee ID", value: userData.idNumber },
                       { icon: Building, label: "Type", value: userData.employeeType },
                       { icon: DollarSign, label: "Salary", value: userData.salary ? `₱${userData.salary}` : "" , className: "text-green-600" },
@@ -157,5 +224,6 @@ const Navbar = ({ toggleSidebar }) => {
       <div className={`fixed inset-0 bg-gray-800 bg-opacity-50 z-40 ${showModal ? "block" : "hidden"}`} onClick={handleClose}></div>
     </>
   );
-}
+};
+
 export default Navbar;

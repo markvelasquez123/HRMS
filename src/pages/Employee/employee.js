@@ -5,15 +5,44 @@ const initialFormState = {
   idNumber: "", firstName: "", lastName: "", birthDate: "", Position: "", Department: "", hireDate: "",
   ProfilePicture: null, ResumeFile: null, email: "", phone: "", gender: "", employeeType: "",
   street1: "", street2: "", city: "", state: "", zip: "", salary: ""
+  
+  
 };
 
-const formReducer = (state, action) => {
+
+
+
+
+  
+  // }
+  // try {
+  //   const response = await fetch("http://localhost/HRMSbackend/employee.php?action=get", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body:JSON.stringify({accid}),
+  //     credentials: "include"
+  //   });
+  //   const accID = await response.json();
+
+  //   if (accID && !accID.error && accID.length > 0) {
+  //     const user = accID[0];
+  //   setUserData(user);
+  //   sessionStorage.setItem('userAccid', JSON.stringify(user));
+
+    
+  // }
+
+
+
+function formReducer(state, action) {
   switch (action.type) {
     case "UPDATE_FIELD": return { ...state, [action.field]: action.value };
     case "RESET": return initialFormState;
     default: return state;
   }
-};
+}
 
 const isOnlyNumbers = (value) => /^\d*$/.test(value);
 const isOnlyLetters = (value) => /^[A-Za-z ]*$/.test(value);
@@ -150,13 +179,40 @@ const EmployeePage = () => {
   const profilePicRef = useRef(null);
   const resumeFileRef = useRef(null);
   const [fieldErrors, setFieldErrors] = useState({ idNumber: "", firstName: "", lastName: "", Position: "", phone: "", salary: "" });
+  const [accID, setaccID] = useState();
+  const [isChecked, setIsChecked] = useState();
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering"];
   const basicFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "gender", "employeeType", "salary"];
   const contactFields = ["email", "phone"];
   const addressFields = ["street1", "street2", "city", "state", "zip"];
 
-  useEffect(() => { loadEmployees(); }, []);
+
+
+  function Clicked(){
+    const handleChange = () => {
+      setIsChecked(!isChecked);
+    }
+  }
+  useEffect(() => {
+     loadEmployees();
+      fetchAccid();
+     }, []);
+  
+     const fetchAccid = async () => {
+     const accid = sessionStorage.getItem('AccID');
+     setaccID(accid)
+    alert("hello" + accID)
+    if (!accID) {
+      console.error("walang acc id");
+      
+      return;
+    }
+    
+  }
+  
+
+  
 
   const loadEmployees = async () => {
     try {
@@ -175,6 +231,8 @@ const EmployeePage = () => {
       setError("Failed to load employees: " + error.message);
     }
   };
+
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -263,6 +321,7 @@ const EmployeePage = () => {
     
     try {
       const response = await fetch("http://localhost/HRMSbackend/employee.php", {
+        // const response = await fetch("http://localhost/HRMSbackend/signup.php")
         method: 'POST',
         body: submitFormData
       });
@@ -300,6 +359,7 @@ const EmployeePage = () => {
       (selectedDepartment === "" || employee.Department === selectedDepartment)
     );
   });
+  
 
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
@@ -397,7 +457,7 @@ const EmployeePage = () => {
             </div>
             <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
               onClick={() => setShowForm(true)}>
-              sessionStorage.getItem('')
+              
               + Add Employee
             </button>
           </div>
@@ -407,10 +467,18 @@ const EmployeePage = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-2xl mx-4 sm:mx-auto overflow-y-auto max-h-[90vh]">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Add New Employee Added by;</h2>
-                <script>
-                  const accid = sessionStorage.getItem(sign.up.accid);
-                </script>
+                <h2 className="text-2xl font-bold text-gray-800">Add New Employee Added by;{accID}</h2>
+                <div> 
+                  <label>
+                    <input 
+                    type = "checkbox"
+                    checked={isChecked}
+                    onChange={Clicked}
+                    />
+                    </label>
+                    
+                  </div>
+                  
                 <button onClick={resetForm} className="text-gray-500 hover:text-gray-700 transition-colors">
                   <X className="w-6 h-6" />
                 </button>
@@ -458,6 +526,7 @@ const EmployeePage = () => {
                     </div>
                   </div>
                 </div>
+                
 
                 <div className="flex justify-end space-x-4 pt-4">
                   <button type="button" onClick={resetForm} className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
@@ -515,6 +584,6 @@ const EmployeePage = () => {
       </div>
     </div>
   );
-};
 
+};
 export default EmployeePage;
