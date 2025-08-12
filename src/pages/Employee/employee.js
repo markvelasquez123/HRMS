@@ -190,6 +190,7 @@ const EmployeePage = () => {
 
 
   function Clicked(){
+    alert("ginalaw")
     const handleChange = () => {
       setIsChecked(!isChecked);
     }
@@ -321,7 +322,6 @@ const EmployeePage = () => {
     
     try {
       const response = await fetch("http://localhost/HRMSbackend/employee.php", {
-        // const response = await fetch("http://localhost/HRMSbackend/signup.php")
         method: 'POST',
         body: submitFormData
       });
@@ -467,7 +467,7 @@ const EmployeePage = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-2xl mx-4 sm:mx-auto overflow-y-auto max-h-[90vh]">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Add New Employee Added by;{accID}</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Add New Employee Added by:{accID}</h2>
                 <div> 
                   <label>
                     <input 
