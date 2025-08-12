@@ -191,7 +191,7 @@ const EmployeePage = () => {
 
   function Clicked(){
     alert("ginalaw")
-    setIsChecked(prev => !prev);
+    setIsChecked(la => !la);
     const handleChange = () => {
       setIsChecked(!isChecked);
     }
@@ -244,7 +244,7 @@ const EmployeePage = () => {
     if ((name === "firstName" || name === "lastName" || name === "Position") && !isOnlyLetters(value)) error = "Only letters are allowed.";
     if (name === "salary" && value && !isValidDecimal(value)) error = "Only numbers and decimal points are allowed.";
     
-    setFieldErrors(prev => ({ ...prev, [name]: error }));
+    setFieldErrors(la => ({ ...la, [name]: error }));
     if (!error) dispatch({ type: "UPDATE_FIELD", field: name, value });
   };
 
