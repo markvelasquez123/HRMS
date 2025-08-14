@@ -1,9 +1,9 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
-import { X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign, Search, Eye, AlertCircle } from "lucide-react";
+import { X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign, Search, Eye, AlertCircle, Carrot } from "lucide-react";
 
 const initialFormState = {
   idNumber: "", firstName: "", lastName: "", birthDate: "", Position: "", Department: "", hireDate: "",
-  ProfilePicture: null, ResumeFile: null, email: "", phone: "", gender: "", employeeType: "",
+  ProfilePicture: null, ResumeFile: null, email: "", phone: "", gender: "", employeeType: "", company: "",
   street1: "", street2: "", city: "", state: "", zip: "", salary: ""
   
   
@@ -137,6 +137,8 @@ const EmployeeSidebar = ({ employee, onClose }) => {
                 {[
                   { icon: IdCard, label: "Employee ID", value: employee.idNumber },
                   { icon: Building, label: "Type", value: employee.employeeType },
+                  { icon: Carrot, label: "Type", value: employee.Company },
+
                   { icon: DollarSign, label: "Salary", value: `₱${employee.salary}`, className: "text-green-600" },
                   { icon: Cake, label: "Hire Date", value: employee.hireDate }
                 ].map(({ icon: Icon, label, value, className = "text-gray-900" }) => (
@@ -183,7 +185,7 @@ const EmployeePage = () => {
   const [isChecked, setIsChecked] = useState(false);
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering"];
-  const basicFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "gender", "employeeType", "salary"];
+  const basicFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "gender", "employeeType","Company", "salary"];
   const contactFields = ["email", "phone"];
   const addressFields = ["street1", "street2", "city", "state", "zip"];
 
@@ -192,9 +194,9 @@ const EmployeePage = () => {
   function Clicked(){
     alert("ginalaw")
     setIsChecked(la => !la);
-    const handleChange = () => {
-      setIsChecked(!isChecked);
-    }
+    // const handleChange = () => {
+    //   setIsChecked(!isChecked);
+    // }
   }
   useEffect(() => {
      loadEmployees();
@@ -278,7 +280,7 @@ const EmployeePage = () => {
   };
 
   const isFormValid = () => {
-    const requiredFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "email", "phone", "gender", "employeeType", "street1", "city", "state", "zip", "salary"];
+    const requiredFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "email", "phone", "gender", "employeeType","Company", "street1", "city", "state", "zip", "salary"];
     
     const textAndDateValid = requiredFields.every((field) => {
       if (field === "birthDate" || field === "hireDate") {
@@ -333,10 +335,7 @@ const EmployeePage = () => {
     });
     
     try {
-      const response = await fetch("http://localhost/HRMSbackend/employee.php", {
-        method: 'POST',
-        body: submitFormData
-      });
+      const response = await fetch("http://localhost/HRMSbackend/employee.php", {method: 'POST',body: submitFormData});
       
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       
@@ -345,12 +344,13 @@ const EmployeePage = () => {
         const text = await response.text();
         console.error("Non-JSON response received:", text);
         throw new Error("Server returned non-JSON response. Check PHP error logs.");
+       
       }
       
       const result = await response.json();
-      
+       
       if (result.success) {
-        
+         
         if (isChecked) {
           try {
             const signupResp = await fetch("http://localhost/HRMSbackend/signup.php", {
@@ -358,9 +358,9 @@ const EmployeePage = () => {
               headers: { "Content-Type": "application/json" },
               credentials: "include",
               body: JSON.stringify({
-                name: `${formData.firstName} ${formData.lastName}`.trim(),
+                name: `${formData.firstName} ${formData.lastName}`,
                 email: formData.email,
-                password: formData.idNumber,
+                password: `${formData.idNumber}${formData.firstName}`,
                 companyId: formData.idNumber
               })
             });
@@ -399,7 +399,7 @@ const EmployeePage = () => {
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
       idNumber: "Employee ID", firstName: "First Name", lastName: "Last Name", hireDate: "Hire Date",
-      birthDate: "Birth Date", employeeType: "Employee Type", Position: "Position", Department: "Department", salary: "Salary",
+      birthDate: "Birth Date", employeeType: "Employee Type",company: "Company", Position: "Position", Department: "Department", salary: "Salary",
       accid: "Account ID",
     };
     const label = labelMap[field] || field.replace(/([A-Z])/g, " $1").trim();
@@ -431,6 +431,17 @@ const EmployeePage = () => {
           <select {...commonProps}>
             <option value="">Select Employee Type</option>
             {["Regular", "Project-Based", "Probationary"].map(type => <option key={type} value={type}>{type}</option>)}
+          </select>
+        </div>
+      );
+    }
+    if (field === "Company") {
+      return (
+        <div key={field} className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Company *</label>
+          <select {...commonProps}>
+            <option value="">Select Company</option>
+            {["Rigel", "Peak", "Asia Navis"].map(type => <option key={type} value={type}>{type}</option>)}
           </select>
         </div>
       );
@@ -600,6 +611,7 @@ const EmployeePage = () => {
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{employee.FirstName} {employee.LastName}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Department}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.employeeType}</div></td>
+
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.gender}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Position}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">₱{employee.salary}</div></td>
