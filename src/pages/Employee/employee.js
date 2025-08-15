@@ -137,7 +137,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
                 {[
                   { icon: IdCard, label: "Employee ID", value: employee.idNumber },
                   { icon: Building, label: "Type", value: employee.employeeType },
-                  { icon: Carrot, label: "Type", value: employee.Company },
+                  { icon: Carrot, label: "Type", value: employee.company },
 
                   { icon: DollarSign, label: "Salary", value: `₱${employee.salary}`, className: "text-green-600" },
                   { icon: Cake, label: "Hire Date", value: employee.hireDate }
