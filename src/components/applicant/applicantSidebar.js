@@ -229,52 +229,49 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   };
 
   const handleReject = async () => {
-    try {
-      setLoading(true);
-      
-      console.log('Starting reject process for:', applicant);
-      
-      // Insert to pool table with 'Rejected' status
-      console.log('Attempting to insert to pool table...');
-      const poolResult = await insertToPool(applicant, 'Rejected');
-      
-      console.log('Pool insertion result:', poolResult);
-      
-      if (poolResult && poolResult.success === false) {
-        console.error('Failed to insert to pool table:', poolResult.error);
-        alert(`Warning: Failed to add to pool table: ${poolResult.error}. Continuing with rejection...`);
-      } else if (poolResult && poolResult.success) {
-        console.log('Successfully added to pool table');
-      }
-      
-      
-      setStatus("Rejected");
-      
-      // Dispatch events to refresh the applicants list
-      window.dispatchEvent(new CustomEvent("refreshApplicants"));
-      
-      // Dispatch specific event for this applicant being rejected
-      window.dispatchEvent(new CustomEvent("applicantStatusChange", {
-        detail: { 
-          applicantId: applicant.uid || applicant.email,
-          status: "Rejected"
-        }
-      }));
+  try {
+    setLoading(true);
 
-      // Call the onStatusChange callback if provided
-      if (onStatusChange) {
-        onStatusChange();
-      }
-      
-      alert("Applicant rejected and added to pool.");
-      handleClose();
-    } catch (error) {
-      console.error("Error rejecting applicant:", error);
-      alert(`Failed to reject applicant: ${error.message}`);
-    } finally {
-      setLoading(false);
+    // 1. Insert to pool table with 'Rejected' status
+    const poolResult = await insertToPool(applicant, 'Rejected');
+    if (poolResult && poolResult.success === false) {
+      alert(`Warning: Failed to add to pool table: ${poolResult.error}. Continuing with rejection...`);
     }
-  };
+
+    // 2. Remove from applicants table in the database
+    const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email: applicant.email })
+    });
+    const deleteResponse = await deleteResult.json();
+    if (!deleteResult.ok || !deleteResponse.success) {
+      throw new Error(deleteResponse.message || 'Failed to delete applicant from database.');
+    }
+
+    setStatus("Rejected");
+
+    // Dispatch events to refresh the applicants list
+    window.dispatchEvent(new CustomEvent("refreshApplicants"));
+    window.dispatchEvent(new CustomEvent("applicantStatusChange", {
+      detail: { 
+        applicantId: applicant.uid || applicant.email,
+        status: "Rejected"
+      }
+    }));
+
+    if (onStatusChange) onStatusChange();
+
+    alert("Applicant rejected, added to pool, and removed from applicants.");
+    handleClose();
+  } catch (error) {
+    console.error("Error rejecting applicant:", error);
+    alert(`Failed to reject applicant: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const getStatusBadgeClass = () => {
     if (status === "Accepted") return "bg-green-50 text-green-700 border-green-200";

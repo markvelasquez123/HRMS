@@ -89,7 +89,6 @@ const LoginPage = () => {
           resetForm();
           setIsSignUp(false); 
         } else {
-          alert("Login successful! Redirecting...");
           sessionStorage.setItem('userEmail', email);
           const v = sessionStorage.getItem('userEmail');
           alert("Log in as " + v);

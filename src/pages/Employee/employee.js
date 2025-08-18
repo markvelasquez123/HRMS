@@ -206,7 +206,7 @@ const EmployeePage = () => {
      const fetchAccid = async () => {
      const accid = sessionStorage.getItem('AccID');
      setaccID(accid)
-    alert("hello" + accID)
+    
     if (!accID) {
       console.error("walang acc id");
       
