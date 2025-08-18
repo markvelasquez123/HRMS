@@ -29,37 +29,80 @@ const Header = ({ isHeaderOpen }) => {
         />
       </div>
 
-      {/* Navigation Links */}
-      <ul className="w-full flex flex-col">
-        {[
+      {/* Nav links*/}
+      {/* Base sa company ang pag rerestrict at nalalaman kung anong company ang nag log sa paraang ng sessionStorage get item*/}
+      {(() => {
+        let company = "";
+        try {
+          const userData = JSON.parse(sessionStorage.getItem("userData"));
+          company = userData?.company?.toLowerCase() || "";
+        } catch (e) {
+          company = "";
+        }
+        //Tinitignan dito kung asia navis ba ang naka logged if true ay makikita niya lahat ng page, kung hindi asia navis ay diretso if statement na
+        const isAsiaNavis = company === "asia navis";
+        const links = [
           { to: "/Homepage", label: "Home", icon: "home", color: "text-blue-600" },
-          { to: "/EmployeePage", label: "Employee", icon: "users", color: "text-green-600" },
+          ...(isAsiaNavis ? [{ to: "/EmployeePage", label: "Employee", icon: "users", color: "text-green-600" }] : []),
           { to: "/ApplicantPage", label: "Applicant", icon: "user", color: "text-purple-600" },
           { to: "/Pool", label: "Pool", icon: "database", color: "text-yellow-600" },
-          { to: "/Statistics", label: "Statistics", icon: "chart-bar", color: "text-red-600" },
+          ...(isAsiaNavis ? [{ to: "/Statistics", label: "Statistics", icon: "chart-bar", color: "text-red-600" }] : []),
           { to: "/Settings", label: "Settings", icon: "cog", color: "text-gray-600" },
-        ].map((item) => (
-          <li key={item.to} className="w-full px-2 py-1">
-            <Link
-              to={item.to}
-              className={`flex items-center w-full p-[0.8rem] rounded-lg transition-all duration-300 ${
-                location.pathname === item.to 
-                  ? "bg-blue-50 text-blue-600" 
-                  : "hover:bg-gray-50 hover:text-blue-600"
-              } ${isHeaderOpen ? "justify-start pl-4" : "justify-center"}`}
-            >
-              <i className={`fas fa-${item.icon} ${item.color} text-lg transition-transform duration-300`} />
-              {isHeaderOpen && (
-                <span className="ml-2 text-gray-700 font-medium">
-                  {item.label}
-                </span>
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
+        ];
+        // Ang pag kakaintindi ko dito ay nirerestrict na dito sa baba pag ka hindi Asia Navis ang nag logged is hindi nila makikita ang EmployeePage & Statistics
+        if (!isAsiaNavis) {
+          return (
+            <ul className="w-full flex flex-col">
+              {links.filter(link => link.to !== "/EmployeePage" && link.to !== "/Statistics").map((item) => (
+                <li key={item.to} className="w-full px-2 py-1">
+                  <Link
+                    to={item.to}
+                    className={`flex items-center w-full p-[0.8rem] rounded-lg transition-all duration-300 ${
+                      location.pathname === item.to 
+                        ? "bg-blue-50 text-blue-600" 
+                        : "hover:bg-gray-50 hover:text-blue-600"
+                    } ${isHeaderOpen ? "justify-start pl-4" : "justify-center"}`}
+                  >
+                    <i className={`fas fa-${item.icon} ${item.color} text-lg transition-transform duration-300`} />
+                    {isHeaderOpen && (
+                      <span className="ml-2 text-gray-700 font-medium">
+                        {item.label}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          );
+        } else {
+        
+          return (
+            <ul className="w-full flex flex-col">
+              {links.map((item) => (
+                <li key={item.to} className="w-full px-2 py-1">
+                  <Link
+                    to={item.to}
+                    className={`flex items-center w-full p-[0.8rem] rounded-lg transition-all duration-300 ${
+                      location.pathname === item.to 
+                        ? "bg-blue-50 text-blue-600" 
+                        : "hover:bg-gray-50 hover:text-blue-600"
+                    } ${isHeaderOpen ? "justify-start pl-4" : "justify-center"}`}
+                  >
+                    <i className={`fas fa-${item.icon} ${item.color} text-lg transition-transform duration-300`} />
+                    {isHeaderOpen && (
+                      <span className="ml-2 text-gray-700 font-medium">
+                        {item.label}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+      })()}
 
-      {/* Logout Button */}
+      
       <div className="mt-auto w-full px-2 py-4">
         <button
           onClick={handleLogout}

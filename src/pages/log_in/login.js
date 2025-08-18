@@ -7,7 +7,7 @@ const LoginPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [companyId, setCompanyId] = useState("");
+  const [company, setCompany] = useState("");
    const [error, setError] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +18,7 @@ const LoginPage = () => {
     setName("");
     setEmail("");
     setPassword("");
-    setCompanyId("");
+  setCompany("");
     setError("");
   };
 
@@ -29,7 +29,7 @@ const LoginPage = () => {
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
-    const trimmedCompanyId = companyId.trim();
+  const trimmedCompany = company.trim();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
@@ -38,7 +38,7 @@ const LoginPage = () => {
       !trimmedPassword ||
       
 
-      (isSignUp && !trimmedCompanyId) ||
+  (isSignUp && !trimmedCompany) ||
       (isSignUp && !trimmedName)
     ) {
       setError("All fields are required.");
@@ -67,8 +67,7 @@ const LoginPage = () => {
             name: trimmedName,
             email: trimmedEmail,
             password: trimmedPassword,
-            companyId: trimmedCompanyId,
-            
+            company: trimmedCompany,
           }
         : {
             email: trimmedEmail,
@@ -186,20 +185,25 @@ const LoginPage = () => {
           {isSignUp && (
             <div>
               <label
-                htmlFor="companyId"
+                htmlFor="company"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Company ID
+                Company
               </label>
-              <input
-                id="companyId"
-                type="text"
-                value={companyId}
-                onChange={(e) => setCompanyId(e.target.value)}
-                placeholder="Enter your company ID"
+              <select
+                id="company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
                 required={isSignUp}
                 className="bg-gray-50 border border-gray-300 rounded-lg p-2.5 w-full text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-blue-600 focus:border-blue-600"
-              />
+              >
+                <option value="" disabled>
+                  Select a company
+                </option>
+                <option value="Asia Navis">Asia Navis</option>
+                <option value="Rigel">Rigel</option>
+                <option value="Peak HR">Peak HR</option>
+              </select>
             </div>
           )}
 

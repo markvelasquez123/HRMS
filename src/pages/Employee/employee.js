@@ -185,7 +185,7 @@ const EmployeePage = () => {
   const [isChecked, setIsChecked] = useState(false);
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering"];
-  const basicFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "gender", "employeeType","Company", "salary"];
+  const basicFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "gender", "employeeType", "company", "salary"];
   const contactFields = ["email", "phone"];
   const addressFields = ["street1", "street2", "city", "state", "zip"];
 
@@ -204,14 +204,13 @@ const EmployeePage = () => {
      }, []);
   
      const fetchAccid = async () => {
-     const accid = sessionStorage.getItem('AccID');
-     setaccID(accid)
-    
-    if (!accID) {
-      console.error("walang acc id");
-      
-      return;
-    }
+  const accid = sessionStorage.getItem('AccID');
+  setaccID(accid);
+
+  if (!accid) { // use accid, not accID
+    console.error("walang acc id");
+    return;
+  }
     
   }
   
@@ -280,7 +279,7 @@ const EmployeePage = () => {
   };
 
   const isFormValid = () => {
-    const requiredFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "email", "phone", "gender", "employeeType","Company", "street1", "city", "state", "zip", "salary"];
+  const requiredFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "email", "phone", "gender", "employeeType", "company", "street1", "city", "state", "zip", "salary"];
     
     const textAndDateValid = requiredFields.every((field) => {
       if (field === "birthDate" || field === "hireDate") {
@@ -291,6 +290,7 @@ const EmployeePage = () => {
       if (field === "phone" && !isOnlyNumbers(formData[field])) return false;
       if (field === "salary" && (!formData[field] || !isValidDecimal(formData[field]))) return false;
       if ((field === "firstName" || field === "lastName" || field === "Position") && !isOnlyLetters(formData[field])) return false;
+      if (field === "company" && (!formData.company || formData.company === "")) return false;
       return formData[field] && formData[field].toString().trim() !== "";
     });
     
@@ -360,8 +360,8 @@ const EmployeePage = () => {
               body: JSON.stringify({
                 name: `${formData.firstName} ${formData.lastName}`,
                 email: formData.email,
-                password: `${formData.idNumber}${formData.firstName}`,
-                companyId: formData.idNumber
+                password: "123123",
+                company: formData.company
               })
             });
             const signupJson = await signupResp.json();
@@ -399,7 +399,7 @@ const EmployeePage = () => {
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
       idNumber: "Employee ID", firstName: "First Name", lastName: "Last Name", hireDate: "Hire Date",
-      birthDate: "Birth Date", employeeType: "Employee Type",company: "Company", Position: "Position", Department: "Department", salary: "Salary",
+      birthDate: "Birth Date", employeeType: "Employee Type", company: "Company", Position: "Position", Department: "Department", salary: "Salary",
       accid: "Account ID",
     };
     const label = labelMap[field] || field.replace(/([A-Z])/g, " $1").trim();
@@ -435,13 +435,21 @@ const EmployeePage = () => {
         </div>
       );
     }
-    if (field === "Company") {
+    if (field === "company") {
       return (
         <div key={field} className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Company *</label>
-          <select {...commonProps}>
+          <select
+            name="company"
+            value={formData.company || ""}
+            onChange={handleChange}
+            className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required={isRequired}
+          >
             <option value="">Select Company</option>
-            {["Rigel", "Peak", "Asia Navis"].map(type => <option key={type} value={type}>{type}</option>)}
+            <option value="Asia Navis">Asia Navis</option>
+            <option value="Rigel">Rigel</option>
+            <option value="Peak HR">Peak HR</option>
           </select>
         </div>
       );
