@@ -232,13 +232,11 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   try {
     setLoading(true);
 
-    // 1. Insert to pool table with 'Rejected' status
     const poolResult = await insertToPool(applicant, 'Rejected');
     if (poolResult && poolResult.success === false) {
       alert(`Warning: Failed to add to pool table: ${poolResult.error}. Continuing with rejection...`);
     }
 
-    // 2. Remove from applicants table in the database
     const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -252,7 +250,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
     setStatus("Rejected");
 
-    // Dispatch events to refresh the applicants list
+  
     window.dispatchEvent(new CustomEvent("refreshApplicants"));
     window.dispatchEvent(new CustomEvent("applicantStatusChange", {
       detail: { 
