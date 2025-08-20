@@ -392,7 +392,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
             
             {loading && (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-pulse text-gray-500">Loading...</div>
+                <div className="animate-pulse text-gray-500">Loadinggg...</div>
               </div>
             )}
 

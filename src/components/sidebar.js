@@ -49,7 +49,7 @@ const Header = ({ isHeaderOpen }) => {
           ...(isAsiaNavis ? [{ to: "/Statistics", label: "Statistics", icon: "chart-bar", color: "text-red-600" }] : []),
           { to: "/Settings", label: "Settings", icon: "cog", color: "text-gray-600" },
         ];
-        // Ang pag kakaintindi ko dito ay nirerestrict na dito sa baba pag ka hindi Asia Navis ang nag logged is hindi nila makikita ang EmployeePage & Statistics
+        // Anggg pag kakaintindi ko dito ay nirerestrict na dito sa baba pag ka hindi Asia Navis ang nag logged is hindi nila makikita ang EmployeePage & Statistics
         if (!isAsiaNavis) {
           return (
             <ul className="w-full flex flex-col">

@@ -97,7 +97,7 @@ const LoginPage = () => {
         setError(result.message || "Something went wrong");
       }
     } catch {
-      setError("Failed to connect to server.");
+      setError("Failed to connect to serverrr.");
     }
     
 
