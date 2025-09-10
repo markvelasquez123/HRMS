@@ -572,8 +572,8 @@ const EmployeePage = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {["Picture", "Employee ID", "Name", "Department", "Employee Type", "Gender", "Position", "Salary","Date Hired", "Action"].map(header => (
-                  <th key={header} className={`px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider ${header === "Action" ? "text-right" : "text-left"}`}>
+                {["Picture", "Employee ID", "Name", "Department", "Employee Type", "Gender", "Position", "Salary","Date Hired"].map(header => (
+                  <th key={header} className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">
                     {header}
                   </th>
                 ))}
@@ -581,7 +581,11 @@ const EmployeePage = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEmployees.map((employee, index) => (
-                <tr key={employee.id || index} className="hover:bg-gray-50 transition-colors duration-150">
+                <tr 
+                  key={employee.id || index} 
+                  className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                  onClick={() => setSelectedEmployee(employee)}
+                >
                   <td className="px-6 py-4">
                     
                     <img src={employee.ProfilePicture ? `http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
@@ -596,11 +600,6 @@ const EmployeePage = () => {
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Position}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">₱{employee.salary}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.hireDate}</div></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button onClick={() => setSelectedEmployee(employee)} className="text-gray-500 hover:text-blue-600 transition-colors duration-200">
-                      <Eye className="w-5 h-5" />
-                    </button>
-                  </td>
                 </tr>
               ))}
               {filteredEmployees.length === 0 && (

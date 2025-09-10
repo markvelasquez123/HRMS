@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Piechart } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export default function ApplicantCharts() {
   const [applicantCount, setApplicantCount] = useState(0);
@@ -25,6 +25,9 @@ export default function ApplicantCharts() {
   const [error, setError] = useState("");
   const [removedEmployees, setRemovedEmployees] = useState([]);
 
+  // Color palettes for pie charts
+  const poolColors = ['#2196F3', '#4CAF50', '#F44336', '#9C27B0'];
+  const employeeColors = ['#FF9800', '#2196F3', '#4CAF50'];
  
   const fetchEmployeesFromBackend = async () => {
     try {
@@ -345,13 +348,12 @@ export default function ApplicantCharts() {
     setRetentionData(getRetentionData());
   }, [q1Hires, q2Hires, q3Hires, q4Hires, q1Resigned, q2Resigned, q3Resigned, q4Resigned]);
 
-  const statusData = [{
-    name: "Applicants",
-    All: applicantCount,
-    Accepted: acceptedCount,
-    Rejected: rejectedCount,
-    Resigned: resignedCount
-  }];
+  const poolStatusData = [
+    { name: "Accepted", value: acceptedCount },
+    { name: "Rejected", value: rejectedCount },
+    { name: "Resigned", value: resignedCount },
+    { name: "Others", value: Math.max(0, applicantCount - acceptedCount - rejectedCount - resignedCount) }
+  ].filter(item => item.value > 0);
 
   const handleYearClick = (data) => {
     if (selectedYear === data.year) {
@@ -399,6 +401,12 @@ export default function ApplicantCharts() {
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
   };
 
+  // Custom label function for pie charts
+  const renderLabel = (entry) => {
+    if (entry.value === 0) return '';
+    return `${entry.name}: ${entry.value}`;
+  };
+
   return (
     <div className="flex flex-col w-full p-6 bg-gray-50">
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Statistics Dashboard</h1>
@@ -430,17 +438,24 @@ export default function ApplicantCharts() {
           </h2>
           <div className="w-full h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={statusData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" stroke="#666" />
-                <YAxis allowDecimals={false} stroke="#666" />
+              <PieChart>
+                <Pie
+                  data={poolStatusData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderLabel}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {poolStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={poolColors[index % poolColors.length]} />
+                  ))}
+                </Pie>
                 <Tooltip contentStyle={chartStyle} />
                 <Legend />
-                <Bar dataKey="All" fill="#2196F3" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Accepted" fill="#4CAF50" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Rejected" fill="#F44336" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Resigned" fill="#9C27B0" radius={[4, 4, 0, 0]} />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -451,14 +466,24 @@ export default function ApplicantCharts() {
           </h2>
           <div className="w-full h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={employeeData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" stroke="#666" />
-                <YAxis allowDecimals={false} stroke="#666" />
+              <PieChart>
+                <Pie
+                  data={employeeData.filter(item => item.count > 0)}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderLabel}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="count"
+                >
+                  {employeeData.filter(item => item.count > 0).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={employeeColors[index % employeeColors.length]} />
+                  ))}
+                </Pie>
                 <Tooltip contentStyle={chartStyle} />
                 <Legend />
-                <Bar dataKey="count" fill="#FF9800" radius={[4, 4, 0, 0]} />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
