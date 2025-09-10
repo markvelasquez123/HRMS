@@ -11,11 +11,12 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   const [departmentDropdownVisible, setDepartmentDropdownVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isEmployee, setIsEmployee] = useState(false);
+  const [isOFW, setIsOFW] = useState(false);
 
   useEffect(() => {
     if (!initialApplicant) return;
 
-    // If the initial applicant already has detailed data, use that
     if (initialApplicant.detailedData || 
         (initialApplicant.street1 && initialApplicant.city)) {
       setApplicant(initialApplicant);
@@ -36,13 +37,11 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         
         const data = await res.json();
         
-        // Try to find matching applicant in details
         const foundApplicant = data.details?.find(detail => {
-          // Match by email if available
           if (initialApplicant.email && detail.email) {
             return detail.email.toLowerCase() === initialApplicant.email.toLowerCase();
           }
-          // Fall back to name and position match
+          
           return (
             detail.firstName && detail.lastName && detail.position &&
             detail.firstName.toLowerCase() === initialApplicant.firstName?.toLowerCase() &&
@@ -54,12 +53,12 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         if (foundApplicant) {
           setApplicant({ ...initialApplicant, ...foundApplicant });
         } else {
-          setApplicant(initialApplicant); // Use whatever data we have
+          setApplicant(initialApplicant);
           setError("Additional applicant details not found");
         }
       } catch (e) {
         console.error('Error fetching applicant:', e);
-        setApplicant(initialApplicant); // Fall back to initial data
+        setApplicant(initialApplicant); 
         setError(`Failed to fetch additional details: ${e.message}`);
       } finally {
         setLoading(false);
@@ -76,7 +75,20 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
     setTimeout(() => onClose(), 300);
   };
 
-  // Function to insert data into pool table
+  
+  const handleEmployeeCheck = () => {
+    setIsEmployee(true);
+    setIsOFW(false);
+  };
+
+  const handleOFWCheck = () => {
+    setIsOFW(true);
+    setIsEmployee(false);
+    
+    setEmployeeType("");
+    setDepartment("");
+  };
+
   const insertToPool = async (applicantData, statusValue) => {
     try {
       console.log('insertToPool called with:', { applicantData, statusValue });
@@ -101,9 +113,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         body: JSON.stringify(poolData)
       });
 
-      console.log('Pool API response status:', response.status);
-      console.log('Pool API response headers:', response.headers);
-
       const responseText = await response.text();
       console.log('Pool API raw response:', responseText);
 
@@ -112,7 +121,13 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         result = JSON.parse(responseText);
       } catch (parseError) {
         console.error('Failed to parse pool API response:', parseError);
-        console.error('Raw response was:', responseText);
+        console.error('Raw response:', responseText);
+        
+        // Check if response contains PHP error indicators
+        if (responseText.includes('<br />') || responseText.includes('Fatal error') || responseText.includes('Warning:') || responseText.includes('Notice:')) {
+          throw new Error(`PHP Error in pool.php. Check server logs and ensure your PHP backend is working correctly.`);
+        }
+        
         throw new Error(`Invalid JSON response from pool API: ${responseText.substring(0, 100)}...`);
       }
       
@@ -129,12 +144,149 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   };
 
   const handleAccept = async () => {
+  
+  if (isEmployee) {
     if (!employeeType) return alert("Please select an employment type first");
     if (!department) return alert("Please select a department first");
-
-    setLoading(true);
+  } else if (isOFW) {
     
-    try {
+  } else {
+    return alert("Please select either Employee or Overseas Filipino Worker");
+  }
+
+  setLoading(true);
+  
+  try {
+    if (isOFW) {
+      
+      const ofwData = {
+
+        firstName: applicant.firstName,
+        lastName: applicant.lastName,
+        email: applicant.email,
+        phone: applicant.phone,
+        position: applicant.position,
+        department: "OFW",
+        employeeType: "OFW",
+        dateHired: new Date().toISOString().split('T')[0],
+        
+        
+        birthDay: applicant.birthDay,
+        birthMonth: applicant.birthMonth,
+        birthYear: applicant.birthYear,
+        gender: applicant.gender,
+        
+        
+        street1: applicant.street1,
+        street2: applicant.street2 || "",
+        city: applicant.city,
+        state: applicant.state,
+        zip: applicant.zip,
+        
+        profilePicture: applicant.avatar,
+        resumeUrl: applicant.resumeUrl,
+        
+        
+        passport: applicant.passport,
+        diploma: applicant.diploma,
+        tor: applicant.tor,
+        medical: applicant.medical,
+        tinId: applicant.tinId,
+        nbiClearance: applicant.nbiClearance,
+        policeClearance: applicant.policeClearance,
+        pagibigNumber: applicant.pagibigNumber,
+        philhealthNumber: applicant.philhealthNumber,
+      };
+
+      console.log('OFW Data being sent:', ofwData);
+
+      // Step 1: Add to OFW table
+      const response = await fetch('http://localhost/HRMSbackend/add_ofw.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(ofwData)
+      });
+
+      const responseText = await response.text();
+      console.log('OFW API Raw response:', responseText);
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError);
+        console.error('Raw response:', responseText);
+        
+        if (responseText.includes('<br />') || responseText.includes('Fatal error') || responseText.includes('Warning:') || responseText.includes('Notice:')) {
+          throw new Error(`PHP Error in add_ofw.php. Check server logs and ensure your PHP backend is working correctly.`);
+        }
+        
+        throw new Error(`Server returned invalid JSON. First 200 chars: ${responseText.substring(0, 200)}...`);
+      }
+
+      if (!response.ok) {
+        throw new Error(result.message || result.error || `HTTP error! status: ${response.status}`);
+      }
+
+      if (result.success) {
+        // Step 2: Remove from applicant table
+        try {
+          const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ email: applicant.email })
+          });
+          
+          const deleteResponseText = await deleteResult.text();
+          console.log('Delete applicant response:', deleteResponseText);
+          
+          let deleteResponse;
+          try {
+            deleteResponse = JSON.parse(deleteResponseText);
+          } catch (parseError) {
+            console.error('Delete response parse error:', parseError);
+            // Continue even if delete response parsing fails
+            deleteResponse = { success: true };
+          }
+          
+          if (!deleteResult.ok || !deleteResponse.success) {
+            console.warn('Failed to delete from applicant table, but OFW was added successfully');
+          }
+        } catch (deleteError) {
+          console.error('Error deleting from applicant table:', deleteError);
+          // Don't throw error here, as OFW was successfully added
+        }
+
+        // Step 3: Add to pool
+        await insertToPool(applicant, 'Accepted as OFW');
+        
+        // Step 4: Update status and trigger events
+        setStatus("Accepted as OFW");
+        
+        window.dispatchEvent(new CustomEvent("refreshApplicants"));
+        window.dispatchEvent(new CustomEvent("refreshOFW"));
+        
+        window.dispatchEvent(new CustomEvent("applicantStatusChange", {
+          detail: { 
+            applicantId: applicant.uid || applicant.email,
+            status: "Accepted as OFW",
+            applicantRemoved: true // Always true for OFW
+          }
+        }));
+
+        if (onStatusChange) {
+          onStatusChange();
+        }
+        
+        alert("Tanggap ka na");
+        handleClose();
+      } else {
+        throw new Error(result.message || result.error || 'Failed to accept applicant as OFW');
+      }
+    } else {
+      // Employee logic remains the same
       const employeeData = {
         firstName: applicant.firstName,
         lastName: applicant.lastName,
@@ -157,7 +309,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         resumeUrl: applicant.resumeUrl,
       };
 
-      console.log('Sending data:', employeeData);
+      console.log('Sending employee data:', employeeData);
 
       const response = await fetch('http://localhost/HRMSbackend/accept_applicant.php', {
         method: 'POST',
@@ -166,17 +318,20 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         body: JSON.stringify(employeeData)
       });
 
-      console.log('Response status:', response.status);
-
       const responseText = await response.text();
-      console.log('Raw response:', responseText);
+      console.log('Employee API Raw response:', responseText);
 
       let result;
       try {
         result = JSON.parse(responseText);
       } catch (parseError) {
         console.error('JSON Parse Error:', parseError);
-        console.error('Response text:', responseText);
+        console.error('Raw response:', responseText);
+        
+        if (responseText.includes('<br />') || responseText.includes('Fatal error') || responseText.includes('Warning:') || responseText.includes('Notice:')) {
+          throw new Error(`PHP Error in accept_applicant.php. Check server logs and ensure your PHP backend is working correctly.`);
+        }
+        
         throw new Error(`Server returned invalid JSON. Response: ${responseText.substring(0, 200)}...`);
       }
 
@@ -187,14 +342,11 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       if (result.success) {
         setStatus("Accepted");
         
-        // Insert to pool table with 'Accepted' status
         await insertToPool(applicant, 'Accepted');
         
-        // Dispatch events to refresh both applicants and employees lists
         window.dispatchEvent(new CustomEvent("refreshApplicants"));
         window.dispatchEvent(new CustomEvent("refreshEmployees"));
         
-        // Dispatch specific event for this applicant being accepted/removed
         window.dispatchEvent(new CustomEvent("applicantStatusChange", {
           detail: { 
             applicantId: applicant.uid || applicant.email,
@@ -203,7 +355,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
           }
         }));
 
-        // Call the onStatusChange callback if provided
         if (onStatusChange) {
           onStatusChange();
         }
@@ -213,66 +364,66 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       } else {
         throw new Error(result.message || result.error || 'Failed to accept applicant');
       }
-    } catch (error) {
-      console.error("Error accepting applicant:", error);
-      
-      if (error.message.includes('fetch')) {
-        alert('Network error: Could not connect to server. Please check if the backend is running.');
-      } else if (error.message.includes('JSON')) {
-        alert('Server error: Invalid response format. Check server logs for details.');
-      } else {
-        alert(`Failed to accept applicant: ${error.message}`);
+    }
+  } catch (error) {
+    console.error("Error accepting applicant:", error);
+    
+    if (error.message.includes('fetch')) {
+      alert('Network error: Could not connect to server. Please check if the backend is running.');
+    } else if (error.message.includes('JSON') || error.message.includes('PHP Error')) {
+      alert('Server error: Your PHP backend is returning errors instead of JSON. Check your server logs for PHP errors.');
+    } else {
+      alert(`Failed to accept applicant: ${error.message}`);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+  const handleReject = async () => {
+    try {
+      setLoading(true);
+
+      const poolResult = await insertToPool(applicant, 'Rejected');
+      if (poolResult && poolResult.success === false) {
+        alert(`Warning: Failed to add to pool table: ${poolResult.error}. Continuing with rejection...`);
       }
+
+      const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: applicant.email })
+      });
+      const deleteResponse = await deleteResult.json();
+      if (!deleteResult.ok || !deleteResponse.success) {
+        throw new Error(deleteResponse.message || 'Failed to delete applicant from database.');
+      }
+
+      setStatus("Rejected");
+
+      window.dispatchEvent(new CustomEvent("refreshApplicants"));
+      window.dispatchEvent(new CustomEvent("applicantStatusChange", {
+        detail: { 
+          applicantId: applicant.uid || applicant.email,
+          status: "Rejected"
+        }
+      }));
+
+      if (onStatusChange) onStatusChange();
+
+      alert("Applicant rejected, added to pool, and removed from applicants.");
+      handleClose();
+    } catch (error) {
+      console.error("Error rejecting applicant:", error);
+      alert(`Failed to reject applicant: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleReject = async () => {
-  try {
-    setLoading(true);
-
-    const poolResult = await insertToPool(applicant, 'Rejected');
-    if (poolResult && poolResult.success === false) {
-      alert(`Warning: Failed to add to pool table: ${poolResult.error}. Continuing with rejection...`);
-    }
-
-    const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email: applicant.email })
-    });
-    const deleteResponse = await deleteResult.json();
-    if (!deleteResult.ok || !deleteResponse.success) {
-      throw new Error(deleteResponse.message || 'Failed to delete applicant from database.');
-    }
-
-    setStatus("Rejected");
-
-  
-    window.dispatchEvent(new CustomEvent("refreshApplicants"));
-    window.dispatchEvent(new CustomEvent("applicantStatusChange", {
-      detail: { 
-        applicantId: applicant.uid || applicant.email,
-        status: "Rejected"
-      }
-    }));
-
-    if (onStatusChange) onStatusChange();
-
-    alert("Applicant rejected, added to pool, and removed from applicants.");
-    handleClose();
-  } catch (error) {
-    console.error("Error rejecting applicant:", error);
-    alert(`Failed to reject applicant: ${error.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
-
   const getStatusBadgeClass = () => {
     if (status === "Accepted") return "bg-green-50 text-green-700 border-green-200";
+    if (status === "Accepted as OFW") return "bg-blue-50 text-blue-700 border-blue-200";
     if (status === "Rejected") return "bg-red-50 text-red-700 border-red-200";
     return "bg-amber-50 text-amber-700 border-amber-200";
   };
@@ -372,7 +523,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       }`}>
         
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">Applicant Details</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Details</h2>
           <button 
             onClick={handleClose} 
             disabled={loading}
@@ -392,7 +543,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
             
             {loading && (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-pulse text-gray-500">Loadinggg...</div>
+                <div className="animate-pulse text-gray-500">Loading...</div>
               </div>
             )}
 
@@ -410,7 +561,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-              <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
+              <h4 className="font-semibold text-gray-900 mb-3">Contact Info</h4>
               {contactInfo.map(({ icon: Icon, text }, index) => (
                 <div key={index} className="flex items-center text-sm">
                   <Icon className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" />
@@ -441,10 +592,39 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
               )}
             </div>
 
-            <div className="space-y-4">
-              {renderDropdown("Employee Type", Briefcase, employeeType, employeeTypes, dropdownVisible, setDropdownVisible, setEmployeeType)}
-              {renderDropdown("Department", Building, department, departments, departmentDropdownVisible, setDepartmentDropdownVisible, setDepartment)}
+            
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="font-semibold text-gray-900 mb-3">Select Employment Type</h4>
+              <div className="flex flex-col space-y-3">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isEmployee}
+                    onChange={handleEmployeeCheck}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-800">Employee</span>
+                </label>
+
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isOFW}
+                    onChange={handleOFWCheck}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-800">Overseas Filipino Worker</span>
+                </label>
+              </div>
             </div>
+
+           
+            {isEmployee && (
+              <div className="space-y-4">
+                {renderDropdown("Employee Type", Briefcase, employeeType, employeeTypes, dropdownVisible, setDropdownVisible, setEmployeeType)}
+                {renderDropdown("Department", Building, department, departments, departmentDropdownVisible, setDepartmentDropdownVisible, setDepartment)}
+              </div>
+            )}
 
             <div>
               <h4 className="font-semibold text-gray-900 mb-3 flex items-center">

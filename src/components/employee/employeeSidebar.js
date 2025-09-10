@@ -33,7 +33,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
 
     setIsSubmitting(true);
     try {
-      // Simulate API call
+      
       await new Promise(resolve => setTimeout(resolve, 2000));
       alert("Employee resignation processed successfully");
       handleClose();
@@ -108,7 +108,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
     }
   ];
 
-  // Mock employee data for preview
+  
   const mockEmployee = employee || {
     firstName: "John",
     lastName: "Doe",
@@ -150,7 +150,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
           visible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         }`}
       >
-        {/* Header with Gradient */}
+        
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative flex justify-between items-center">
@@ -167,7 +167,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
           </div>
         </div>
 
-        {/* Enhanced Tabs */}
+        
         <div className="flex border-b bg-gray-50">
           <button 
             onClick={() => setActiveTab("details")}
@@ -196,11 +196,11 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
           </button>
         </div>
 
-        {/* Content Area */}
+        
         <div className="flex-1 overflow-y-auto">
           {activeTab === "details" && (
             <div className="p-6 space-y-8">
-              {/* Enhanced Profile Header */}
+              
               <div className="relative">
                 <div className="flex items-center space-x-6">
                   <div className="relative">
@@ -231,9 +231,9 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
                 </div>
               </div>
 
-              {/* Enhanced Details Cards */}
+              
               <div className="grid gap-4">
-                {/* Contact Information */}
+                
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
                   <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
                     <Phone className="w-5 h-5 mr-2 text-blue-600" />
@@ -245,7 +245,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
                         <Phone className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Phone</p>
+                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Phone Number</p>
                         <p className="text-gray-800 font-medium">{currentEmployee.phone || "N/A"}</p>
                       </div>
                     </div>
@@ -254,14 +254,14 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
                         <Mail className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Email</p>
+                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">E-Mail</p>
                         <p className="text-gray-800 font-medium">{currentEmployee.email || "N/A"}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Personal Information */}
+                
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-100">
                   <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
                     <User className="w-5 h-5 mr-2 text-purple-600" />
@@ -306,7 +306,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
                   </div>
                 </div>
 
-                {/* Work Information */}
+                
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
                   <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
                     <Briefcase className="w-5 h-5 mr-2 text-green-600" />
@@ -339,7 +339,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
 
           {activeTab === "documents" && (
             <div className="p-6 space-y-6">
-              {/* Document Status Overview */}
+              
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-800">Document Completion</h3>
@@ -360,7 +360,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
                 </div>
               </div>
 
-              {/* Documents Grid */}
+              
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-800 flex items-center">
                   <FileText className="w-5 h-5 mr-2" />
@@ -446,7 +446,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
           )}
         </div>
         
-        {/* Enhanced Footer */}
+        
         <div className="p-6 border-t bg-gray-50">
           <button
             onClick={() => setShowResignPrompt(true)}
@@ -456,7 +456,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
           </button>
         </div>
 
-        {/* Enhanced Resignation Modal */}
+        
         {showResignPrompt && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl transform transition-all">

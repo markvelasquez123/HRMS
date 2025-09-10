@@ -64,9 +64,9 @@ const ApplicantPage = () => {
       console.log('API Response:', responseData);
 
       if (responseData && Array.isArray(responseData.summary)) {
-        // Merge summary and details data
+        
         const mergedApplicants = responseData.summary.map((summary, index) => {
-          // Find matching detailed data
+          
           const details = responseData.details?.find(detail => 
             (detail.email && detail.email === summary.email) ||
             (detail.firstName === summary.firstName && 
@@ -163,7 +163,7 @@ const ApplicantPage = () => {
       )}
       <div className="p-6 text-gray-800">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">Applicants</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Applicant</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
               <input
@@ -180,7 +180,7 @@ const ApplicantPage = () => {
 
         {loading ? (
           <div className="text-center py-8 bg-white rounded-xl shadow-lg">
-            <p className="text-gray-600">Loading applicants...</p>
+            <p className="text-gray-600">Loading....</p>
           </div>
         ) : error ? (
           <div className="text-center py-8 bg-white rounded-xl shadow-lg">
@@ -201,7 +201,7 @@ const ApplicantPage = () => {
                     Name
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Email
+                    E-Mail
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Phone
@@ -253,7 +253,7 @@ const ApplicantPage = () => {
                 {filteredApplicants.length === 0 && (
                   <tr>
                     <td colSpan="7" className="px-6 py-8 text-center text-gray-500 italic">
-                      No applicants found.
+                      No Applicants Found
                     </td>
                   </tr>
                 )}

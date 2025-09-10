@@ -12,6 +12,7 @@ import Settings from "./pages/settings/settings";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/navBar";
 import Statistics from "./pages/stats/stats";
+import OverseasEmployees from "./pages/Employee/OverseasEmployees";
 
 function Layout({ onUpdatePool, poolData }) {
   const location = useLocation();
@@ -48,6 +49,7 @@ function Layout({ onUpdatePool, poolData }) {
           <Route path="/EmployeePage" element={<EmployeePage />} />
           <Route path="/ApplicantPage" element={<ApplicantPage onUpdatePool={onUpdatePool} />} />
           <Route path="/Pool" element={<Pool poolData={poolData} />} />
+          <Route path="/OverseasEmployees" element={<OverseasEmployees />} />
           <Route path="/Statistics" element={<Statistics />} />
           <Route path="/Settings" element={<Settings />} />
           <Route path="/" element={<LoginPage />} />
