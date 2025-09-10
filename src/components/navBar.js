@@ -64,48 +64,7 @@ const Navbar = ({ toggleSidebar }) => {
    }
 
 
-  // const handleAvatarClick = async () => {
-  //   const email = sessionStorage.getItem('userEmail');  
-  //   setShowModal(true);
-
-  //   if (!email) {
-     
-  //     FData({});
-  //     setFormData({});
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await fetch(, {
-  //       method: "POST","http://localhost/HRMSbackend/employee.php?action=get"
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ email }),  
-  //       credentials: "include"
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (data && !data.error && data.length > 0) {
-  //       const user = data[0];  
-  //       setUserData(user);
-  //       setFormData(user);
-
-       
-  //       sessionStorage.setItem('userData', JSON.stringify(user));
-
-        
-  //       if (user.ProfilePicture) {
-  //         setProfilePic(`http://localhost/HRMSbackend/uploads/${user.ProfilePicture}`);
-  //       }
-  //     } else {
-  //       setUserData({});
-  //       setFormData({});
-  //     }
-  //   } catch (error) {
-  //     setUserData({});
-  //     setFormData({});
-  //   }
-  // };
+  
 
   const handleClose = () => {
     setShowModal(false);
@@ -129,8 +88,11 @@ const Navbar = ({ toggleSidebar }) => {
           <button onClick={toggleSidebar} className="text-gray-700 dark:text-gray-300">
             <Menu size={28} />
           </button>
-          <div className="flex-1 flex justify-center">
-          </div>
+          
+          <div className="flex-1 flex justify-center text-center text-4xl font-bold text-gray-700 mb-3">HRMS</div>
+           
+          
+          
           <button
             type="button"
             className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 ml-4"

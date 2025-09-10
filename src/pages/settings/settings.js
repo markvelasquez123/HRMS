@@ -80,7 +80,7 @@ export default function SettingsPage() {
         return;
       }
 
-      // Re-authenticate user before changing password
+      
       const credential = EmailAuthProvider.credential(
         user.email,
         profile.oldPassword
@@ -89,10 +89,10 @@ export default function SettingsPage() {
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, profile.newPassword);
 
-      // Store the timestamp of password change
+      
       localStorage.setItem('lastPasswordChange', new Date().toISOString());
 
-      // Clear password fields
+      
       setProfile(prev => ({
         ...prev,
         oldPassword: "",
@@ -173,14 +173,14 @@ export default function SettingsPage() {
         </ul>
       </div>
 
-      {/* Main Content */}
+      
       <div className="w-3/4 bg-white p-8 ml-6 rounded-xl shadow-lg">
         {activeTab === "account" && (
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Account Settings</h2>
             <p className="text-gray-600 mb-8">Manage your profile information and account settings.</p>
 
-            {/* Profile Picture */}
+            
             <div className="text-center mb-8">
               <label htmlFor="fileInput" className="cursor-pointer group">
                 <div className="relative inline-block">
@@ -197,7 +197,7 @@ export default function SettingsPage() {
               <input id="fileInput" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
             </div>
 
-            {/* Profile Information */}
+            
             <div className="grid grid-cols-2 gap-6 mb-8">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">First Name</label>
@@ -241,7 +241,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Password Section */}
+            
             <div className="bg-gray-50 p-6 rounded-xl mb-8">
               <div className="flex items-center space-x-2 mb-4">
                 <Lock className="w-5 h-5 text-gray-600" />
@@ -281,7 +281,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Action Buttons */}
+            
             <div className="flex justify-end space-x-4">
               {isModified && !isPasswordModified && (
                 <button
@@ -315,7 +315,7 @@ export default function SettingsPage() {
             <p className="text-gray-600 mb-8">Choose to either temporarily deactivate your account or permanently delete it. Please note that account deletion cannot be undone.</p>
 
             <div className="space-y-6">
-              {/* Deactivate Account */}
+              
               <div className="bg-yellow-50 p-6 rounded-xl border border-yellow-200">
                 <h3 className="text-lg font-semibold text-yellow-800 mb-4">Deactivate Account</h3>
                 <p className="text-yellow-700 mb-4">Temporarily deactivate your account. You can reactivate it later by logging in.</p>
@@ -346,7 +346,7 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              {/* Delete Account */}
+              
               <div className="bg-red-50 p-6 rounded-xl border border-red-200">
                 <h3 className="text-lg font-semibold text-red-800 mb-4">Delete Account</h3>
                 <p className="text-red-700 mb-4">Permanently delete your account and all associated data. This action cannot be undone.</p>
@@ -380,15 +380,15 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Success Messages */}
+        
         {accountDeactivated && (
           <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-6 py-3 rounded-lg shadow-lg">
-            Your account has been deactivated successfully!
+            Deactivated Successfully!
           </div>
         )}
         {accountDeleted && (
           <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded-lg shadow-lg">
-            Your account has been deleted successfully!
+            Deleted Successfully!
           </div>
         )}
       </div>

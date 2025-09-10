@@ -26,7 +26,7 @@ const Pool = () => {
     setLoading(true);
     setError("");
     try {
-      // Updated API endpoint to match your PHP backend structure
+      
       const response = await axios.get(
         "http://localhost/HRMSbackend/get_pool_data.php",
         {
@@ -39,17 +39,17 @@ const Pool = () => {
 
       console.log("API Response:", response.data);
 
-      // Check if the response is successful
+      
       if (!response.data.success) {
         throw new Error(response.data.message || "Failed to fetch pool data");
       }
 
-      // Validate response data
+      
       if (!Array.isArray(response.data.data)) {
         throw new Error("Invalid response format from server");
       }
 
-      // Map the response data from your pool table structure
+      
       const poolRecords = response.data.data.map(record => {
         return {
           name: record.name || 'N/A',
@@ -98,7 +98,7 @@ const Pool = () => {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-800">Pool Database</h2>
+          <h2 className="text-3xl font-bold text-gray-800">Pool</h2>
           <div className="flex gap-2">
             <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
               {poolData.length} Records

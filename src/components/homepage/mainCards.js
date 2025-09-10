@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const MainCards = () => {
   const [employeeCount, setEmployeeCount] = useState(0);
@@ -69,7 +70,7 @@ const MainCards = () => {
         if (poolResponse.data && poolResponse.data.success && Array.isArray(poolResponse.data.data)) {
           const poolCount = poolResponse.data.data.length;
           setPoolCount(poolCount);
-          console.log(`Pool count updated: ${poolCount}`);
+          console.log(`Pool count updated: ${poolResponse.data.data.length}`);
         } else if (poolResponse.data && !poolResponse.data.success) {
           console.warn("Pool API error:", poolResponse.data.message);
           setPoolCount(0);
@@ -95,7 +96,7 @@ const MainCards = () => {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3,].map((i) => (
           <div key={i} className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center animate-pulse">
             <div className="h-6 bg-gray-200 rounded w-20 mb-2"></div>
             <div className="h-10 bg-gray-200 rounded w-16"></div>
@@ -104,21 +105,43 @@ const MainCards = () => {
       </div>
     );
   }
-
+  
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Employees</h3>
-        <span className="text-4xl font-bold text-blue-600">{employeeCount}</span>
-      </div>
-      <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Applicants</h3>
-        <span className="text-4xl font-bold text-green-600">{applicantCount}</span>
-      </div>
-      <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Pool</h3>
-        <span className="text-4xl font-bold text-purple-600">{poolCount}</span>
-      </div>
+      <Link to="/EmployeePage" className="no-underline">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-blue-50 cursor-pointer transition">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Employee</h3>
+          <span className="text-4xl font-bold text-blue-600">{employeeCount}</span>
+        </div>
+      </Link>
+      <Link to="/ApplicantPage" className="no-underline">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-green-50 cursor-pointer transition">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Applicant</h3>
+          <span className="text-4xl font-bold text-blue-600">{applicantCount}</span>
+        </div>
+      </Link>
+      <Link to="/Pool" className="no-underline">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-purple-50 cursor-pointer transition">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Pool</h3>
+          <span className="text-4xl font-bold text-purple-600">{poolCount}</span>
+        </div>
+      </Link>
+      <Link to="/OverseasEmployees" className="no-underline">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-red-50 cursor-pointer transition">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">OFW  </h3>
+        </div>
+      </Link>
+      <Link to="/Statistics" className="no-underline">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-gray-100 cursor-pointer transition">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Statistics</h3>
+        </div>
+      </Link>
+      <Link to="/Settings" className="no-underline">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-gray-100 cursor-pointer transition">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Settings</h3>
+        </div>
+      </Link>
     </div>
   );
 };

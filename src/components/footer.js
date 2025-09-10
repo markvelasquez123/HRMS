@@ -4,10 +4,10 @@ const Footer = () => {
   return (
     <footer className="shadow-xl dark:bg-gray-800">
       <div className="px-4 py-6 mx-auto max-w-screen-xl md:px-8 lg:px-10">
-        {/* Adjusted grid: 1 column on mobile, 2 on small screens, 3 on medium, and 5 on large screens */}
+       
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           
-          {/* Logo & Socials – on larger screens, spans 2 columns */}
+          
           <div className="sm:col-span-2 lg:col-span-2">
             <img
               src={require("../assets/Mainlogo.png")}
@@ -57,7 +57,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Company */}
+          
           <div className="lg:mx-auto">
             <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">
               Company
@@ -71,7 +71,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Socials */}
+          
           <div className="lg:mx-auto">
             <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">
               Socials
@@ -90,7 +90,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Category */}
+          
           <div className="lg:mx-auto">
             <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">
               Category

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import MainCards from "../../components/homepage/mainCards";
-import Todos from "../../components/homepage/todo";
+
 import Navbar from "../../components/navBar";
 
 const HomePage = () => {
@@ -11,10 +11,10 @@ const HomePage = () => {
 
       <div className="w-full ">
      
-        <h2 className="text-2xl font-bold pt-8 pb-4 text-gray-700">Dashboard</h2>
+        <h2 className="text-2xl font-bold pt-8 pb-4 text-gray-700"></h2>
       </div>
       <MainCards/>
-      <Todos/>
+      
     </div>
   );
 };

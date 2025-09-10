@@ -9,33 +9,6 @@ const initialFormState = {
   
 };
 
-
-
-
-
-  
-  // }
-  // try {
-  //   const response = await fetch("http://localhost/HRMSbackend/employee.php?action=get", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json"
-  //     },
-  //     body:JSON.stringify({accid}),
-  //     credentials: "include"
-  //   });
-  //   const accID = await response.json();
-
-  //   if (accID && !accID.error && accID.length > 0) {
-  //     const user = accID[0];
-  //   setUserData(user);
-  //   sessionStorage.setItem('userAccid', JSON.stringify(user));
-
-    
-  // }
-
-
-
 function formReducer(state, action) {
   switch (action.type) {
     case "UPDATE_FIELD": return { ...state, [action.field]: action.value };
@@ -90,7 +63,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
       <div className={`bg-white w-full md:w-[500px] h-full shadow-2xl transform transition-transform duration-300 ${visible ? "translate-x-0" : "translate-x-full"}`}>
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">Employee Details</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Details</h2>
           <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -192,11 +165,9 @@ const EmployeePage = () => {
 
 
   function Clicked(){
-    alert("ginalaw")
+ 
     setIsChecked(la => !la);
-    // const handleChange = () => {
-    //   setIsChecked(!isChecked);
-    // }
+    
   }
   useEffect(() => {
      loadEmployees();
@@ -207,7 +178,7 @@ const EmployeePage = () => {
   const accid = sessionStorage.getItem('AccID');
   setaccID(accid);
 
-  if (!accid) { // use accid, not accID
+  if (!accid) { 
     console.error("walang acc id");
     return;
   }
@@ -415,7 +386,7 @@ const EmployeePage = () => {
     if (field === "Department") {
       return (
         <div key={field} className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Department *</label>
+          <label className="block text-sm font-medium text-gray-700">Departments   *</label>
           <select {...commonProps}>
             <option value="">Select Department</option>
             {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
@@ -500,11 +471,11 @@ const EmployeePage = () => {
           <div className="flex items-center gap-4">
             <select className="border border-gray-300 p-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-200" 
               value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
-              <option value="">All Departments</option>
+              <option value="">Departments</option>
               {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
             </select>
             <div className="relative">
-              <input type="text" placeholder="Search by Name" 
+              <input type="text" placeholder="Name" 
                 className="border border-gray-300 p-2 pl-10 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-200" 
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
               <Search className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
@@ -521,7 +492,7 @@ const EmployeePage = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-2xl mx-4 sm:mx-auto overflow-y-auto max-h-[90vh]">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Add New Employee Added by:{accID}</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Add New Employee By:{accID}</h2>
                 <div> 
                   <label>
                     <input 
@@ -569,14 +540,14 @@ const EmployeePage = () => {
                       <label className="block text-sm font-medium text-gray-700">Profile Picture *</label>
                       <input type="file" accept="image/*" onChange={handleFileChange} ref={profilePicRef} 
                         className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
-                      {!formData.ProfilePicture && <span className="text-red-500 text-xs">Profile picture is required.</span>}
+                      {!formData.ProfilePicture && <span className="text-red-500 text-xs">Required</span>}
                     </div>
                     <div className="space-y-1">
                       <label className="block text-sm font-medium text-gray-700">Resume/CV *</label>
                       <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
                         onChange={handleResumeFileChange} ref={resumeFileRef} 
                         className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
-                      {!formData.ResumeFile && <span className="text-red-500 text-xs">Resume is required.</span>}
+                      {!formData.ResumeFile && <span className="text-red-500 text-xs">Required</span>}
                     </div>
                   </div>
                 </div>
@@ -612,6 +583,7 @@ const EmployeePage = () => {
               {filteredEmployees.map((employee, index) => (
                 <tr key={employee.id || index} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4">
+                    
                     <img src={employee.ProfilePicture ? `http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
                       alt={`${employee.FirstName} ${employee.LastName}`} className="h-12 w-12 rounded-full object-cover border-2 border-gray-200" />
                   </td>

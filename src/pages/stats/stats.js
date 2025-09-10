@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Piechart } from "recharts";
 
 export default function ApplicantCharts() {
   const [applicantCount, setApplicantCount] = useState(0);
@@ -25,7 +25,7 @@ export default function ApplicantCharts() {
   const [error, setError] = useState("");
   const [removedEmployees, setRemovedEmployees] = useState([]);
 
-  // Function to fetch employees from your employee.php backend
+ 
   const fetchEmployeesFromBackend = async () => {
     try {
       const response = await fetch('http://localhost/HRMSbackend/employee.php?action=get');
@@ -45,7 +45,7 @@ export default function ApplicantCharts() {
       return employees;
     } catch (error) {
       console.error("Error fetching employees from backend:", error);
-      // Return mock data if backend fails
+      
       return [
         { 
           id: 1, 
@@ -218,7 +218,7 @@ export default function ApplicantCharts() {
 
   const fetchEmployees = async () => {
     try {
-      // Fetch employees from your backend
+      
       const backendEmployees = await fetchEmployeesFromBackend();
       
       const activeEmployees = backendEmployees.filter(employee => 
@@ -227,7 +227,7 @@ export default function ApplicantCharts() {
       
       setEmployeeList(activeEmployees);
 
-      // Count quarterly hires (using backend data structure)
+      
       const q1List = countQuarterlyData(activeEmployees, 2025, 1);
       const q2List = countQuarterlyData(activeEmployees, 2025, 2);
       const q3List = countQuarterlyData(activeEmployees, 2025, 3);
@@ -238,13 +238,13 @@ export default function ApplicantCharts() {
       setQ3Hires(q3List.length);
       setQ4Hires(q4List.length);
 
-      // Count quarterly resignations
+      
       setQ1Resigned(countResignedQuarterly(1).length);
       setQ2Resigned(countResignedQuarterly(2).length);
       setQ3Resigned(countResignedQuarterly(3).length);
       setQ4Resigned(countResignedQuarterly(4).length);
 
-      // Count employees by type for chart
+     
       const employeeTypeCounts = {
         Regular: 0,
         'Project-Based': 0,
@@ -262,14 +262,14 @@ export default function ApplicantCharts() {
         }
       });
 
-      // Set employee data for chart
+      
       setemployeeData([
         { name: "Regular", count: employeeTypeCounts.Regular },
         { name: "Project Based", count: employeeTypeCounts['Project-Based'] },
         { name: "Probationary", count: employeeTypeCounts.Probationary }
       ]);
 
-      // Count departments
+      
       const departmentCount = {
         PMS: 0, Accounting: 0, Technical: 0, Admin: 0, Utility: 0,
         HR: 0, IT: 0, Marketing: 0, Engineering: 0
@@ -284,7 +284,7 @@ export default function ApplicantCharts() {
 
       setDepartmentData(Object.entries(departmentCount).map(([name, count]) => ({ name, count })));
 
-      // Update monthly data for 2025
+      
       if (selectedYear === 2025) {
         const monthlyRetention = [1, 2, 3, 4].map(q => {
           const hires = q === 1 ? q1List.length : q === 2 ? q2List.length : q === 3 ? q3List.length : q4List.length;
@@ -320,7 +320,7 @@ export default function ApplicantCharts() {
 
     fetchData();
 
-    // Set up interval to refresh data every 30 seconds
+    
     const interval = setInterval(() => {
       fetchEmployees();
       if (new Date().getFullYear() >= 2026) {
@@ -407,14 +407,14 @@ export default function ApplicantCharts() {
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-            <p className="text-blue-600">Loading employee data...</p>
+            <p className="text-blue-600">Loading....</p>
           </div>
         </div>
       )}
       
       {error && (
         <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-800 font-medium">API Connection Issue:</p>
+          <p className="text-yellow-800 font-medium">API Connection Issue</p>
           <p className="text-yellow-700 text-sm">{error}</p>
           <p className="text-yellow-700 text-sm">Using fallback mock data for demonstration.</p>
         </div>
@@ -509,7 +509,7 @@ export default function ApplicantCharts() {
       {selectedYear && (
         <div className="w-full p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-8">
           <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
-            Quarterly Retention Rate for {selectedYear}
+            Quarterly Retention Rate {selectedYear}
           </h2>
           <div className="w-full h-96">
             <ResponsiveContainer width="100%" height="100%">

@@ -90,7 +90,7 @@ const LoginPage = () => {
         } else {
           sessionStorage.setItem('userEmail', email);
           const v = sessionStorage.getItem('userEmail');
-          alert("Log in as " + v);
+          
           navigate("/Homepage");
         }
       } else {
@@ -153,7 +153,7 @@ const LoginPage = () => {
               htmlFor="email"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
-              Your email
+              E-Mail
             </label>
             <input
               id="email"
@@ -198,7 +198,7 @@ const LoginPage = () => {
                 className="bg-gray-50 border border-gray-300 rounded-lg p-2.5 w-full text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-blue-600 focus:border-blue-600"
               >
                 <option value="" disabled>
-                  Select a company
+                  Select A Company
                 </option>
                 <option value="Asia Navis">Asia Navis</option>
                 <option value="Rigel">Rigel</option>
