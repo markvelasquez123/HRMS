@@ -22,8 +22,7 @@ export default function HRMSBanner() {
 
             
             <p className="mx-auto max-w-2xl text-lg leading-8 text-blue-100 lg:text-xl">
-              Streamline your workforce management with our comprehensive HRMS platform. 
-              Manage employees, track performance, and optimize your human capital efficiently.
+              Efficiently manage and track all your employees in one place. Our HRMS platform makes workforce management simple and effective.
             </p>
           </div>
         </div>
