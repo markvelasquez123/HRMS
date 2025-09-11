@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign } from "lucide-react";
 import Logo from "../assets/Mainlogo.png";
+
 const Navbar = ({ toggleSidebar }) => {
   const [profilePic, setProfilePic] = useState("https://i.pinimg.com/736x/93/44/ee/9344ee2e15ea931f5ecbe2b70df8b5ab.jpg");
   const [showModal, setShowModal] = useState(false);
@@ -135,9 +136,18 @@ const Navbar = ({ toggleSidebar }) => {
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                  <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
-                  <div className="flex items-center text-sm"><Mail className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{userData.email}</span></div>
-                  <div className="flex items-center text-sm"><Phone className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{userData.phone}</span></div>
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <Mail className="w-4 h-4 text-gray-600 mr-2" />
+                    Contact Information
+                  </h4>
+                  <div className="flex items-center text-sm">
+                    <Mail className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-900">{userData.email}</span>
+                  </div>
+                  <div className="flex items-center text-sm">
+                    <Phone className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-900">{userData.phone}</span>
+                  </div>
                   <div className="flex items-start text-sm">
                     <MapPin className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-900 leading-relaxed">{userData.street1}{userData.street2 ? `, ${userData.street2}` : ''}, {userData.city}, {userData.state} {userData.zip}</span>
@@ -145,18 +155,27 @@ const Navbar = ({ toggleSidebar }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-blue-50 rounded-lg p-4">
-                    <div className="flex items-center mb-2"><Cake className="w-4 h-4 text-blue-600 mr-2" /><span className="text-sm font-medium text-blue-900">Birth Date</span></div>
-                    <span className="text-sm text-blue-800">{userData.birthDate}</span>
+                    <div className="flex items-center mb-2">
+                      <Cake className="w-4 h-4 text-blue-600 mr-2 flex-shrink-0" />
+                      <span className="text-sm font-medium text-blue-900">Birth Date</span>
+                    </div>
+                    <span className="text-sm text-blue-800 ml-6">{userData.birthDate}</span>
                   </div>
                   {userData.gender && (
                     <div className="bg-purple-50 rounded-lg p-4">
-                      <div className="flex items-center mb-2"><User className="w-4 h-4 text-purple-600 mr-2" /><span className="text-sm font-medium text-purple-900">Gender</span></div>
-                      <span className="text-sm text-purple-800">{userData.gender}</span>
+                      <div className="flex items-center mb-2">
+                        <User className="w-4 h-4 text-purple-600 mr-2 flex-shrink-0" />
+                        <span className="text-sm font-medium text-purple-900">Gender</span>
+                      </div>
+                      <span className="text-sm text-purple-800 ml-6">{userData.gender}</span>
                     </div>
                   )}
                 </div>
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><Briefcase className="w-4 h-4 mr-2" />Employment Information</h4>
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <Briefcase className="w-4 h-4 text-gray-600 mr-2 flex-shrink-0" />
+                    Employment Information
+                  </h4>
                   <div className="space-y-3">
                     {[ 
                       { icon: IdCard, label: "Employee ID", value: userData.idNumber },
@@ -165,7 +184,10 @@ const Navbar = ({ toggleSidebar }) => {
                       { icon: Cake, label: "Hire Date", value: userData.hireDate }
                     ].map(({ icon: Icon, label, value, className = "text-gray-900" }) => (
                       <div key={label} className="flex items-center justify-between">
-                        <div className="flex items-center text-sm"><Icon className="w-4 h-4 text-gray-500 mr-2" /><span className="text-gray-600">{label}</span></div>
+                        <div className="flex items-center text-sm">
+                          <Icon className="w-4 h-4 text-gray-500 mr-2 flex-shrink-0" />
+                          <span className="text-gray-600">{label}</span>
+                        </div>
                         <span className={`text-sm font-medium ${className}`}>{value}</span>
                       </div>
                     ))}
@@ -173,11 +195,15 @@ const Navbar = ({ toggleSidebar }) => {
                 </div>
                 {userData.ResumeFile && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><FileText className="w-4 h-4 mr-2" />Documents</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                      <FileText className="w-4 h-4 text-gray-600 mr-2 flex-shrink-0" />
+                      Documents
+                    </h4>
                     <div className="bg-gray-50 rounded-lg p-4">
                       <a href={`http://localhost/HRMSbackend/uploads/${userData.ResumeFile}`} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
-                        <FileText className="w-4 h-4 mr-2 flex-shrink-0" />View Resume
+                        className="flex items-center text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md transition-colors">
+                        <FileText className="w-4 h-4 mr-3 flex-shrink-0" />
+                        <span>View Resume</span>
                       </a>
                     </div>
                   </div>
