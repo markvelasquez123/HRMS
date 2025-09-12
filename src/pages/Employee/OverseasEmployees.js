@@ -35,7 +35,7 @@ const EmployeeSidebar = ({ employee, onClose, onStatusUpdate }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
-      <div className={`bg-white w-full md:w-[500px] h-full shadow-2xl transform transition-transform duration-300 ${visible ? "translate-x-0" : "translate-x-full"}`}>
+      <div className={`bg-white w-full h-full shadow-2xl transform transition-transform duration-300 ${visible ? "translate-x-0" : "translate-x-full"}`}>
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-900">Employee Details</h2>
           <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">

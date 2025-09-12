@@ -146,7 +146,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
         onClick={handleClose}
       ></div>
       <div
-        className={`relative bg-white w-full max-w-lg h-full shadow-2xl transform transition-all duration-300 flex flex-col ${
+        className={`relative bg-white w-screen h-screen shadow-2xl transform transition-all duration-300 flex flex-col ${
           visible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         }`}
       >
@@ -445,82 +445,6 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
             </div>
           )}
         </div>
-        
-        
-        <div className="p-6 border-t bg-gray-50">
-          <button
-            onClick={() => setShowResignPrompt(true)}
-            className="w-full py-3 px-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
-            Resign Employee
-          </button>
-        </div>
-
-        
-        {showResignPrompt && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl transform transition-all">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-8 h-8 text-red-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">Confirm Resignation</h3>
-                <p className="text-gray-600">This action will process the employee's resignation</p>
-              </div>
-              
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Resignation Date
-                  </label>
-                  <input
-                    type="date"
-                    value={resignationDate}
-                    onChange={(e) => setResignationDate(e.target.value)}
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Reason for Resignation (Optional)
-                  </label>
-                  <textarea
-                    value={resignationReason}
-                    onChange={(e) => setResignationReason(e.target.value)}
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                    rows="3"
-                    placeholder="Enter reason for resignation..."
-                  />
-                </div>
-              </div>
-
-              <div className="flex space-x-3 mt-8">
-                <button
-                  onClick={() => setShowResignPrompt(false)}
-                  className="flex-1 px-6 py-3 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleResign}
-                  disabled={isSubmitting || !resignationDate}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold shadow-lg"
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      Processing...
-                    </div>
-                  ) : (
-                    "Confirm Resignation"
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

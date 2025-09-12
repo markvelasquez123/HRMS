@@ -25,7 +25,7 @@ function Layout({ onUpdatePool, poolData }) {
       {/* Sidebar (Hidden on Login Page) */}
       {!isLoginPage && (
         <div
-          className={`sidebar ${isSidebarOpen ? "w-12" : "w-2"} transition-all duration-300`}
+          className={`sidebar ${isSidebarOpen ? "w-2" : "w-2"}  duration-300`}
           onMouseEnter={() => setIsSidebarOpen(true)}
           onMouseLeave={() => setIsSidebarOpen(false)}
         >
@@ -35,8 +35,8 @@ function Layout({ onUpdatePool, poolData }) {
 
       {/* Main Content */}
       <div
-        className={`flex-1 transition-all duration-300 ${
-          isLoginPage ? "" : isSidebarOpen ? "ml-32" : "ml-16"
+        className={`flex-1  duration-300 ${
+          isLoginPage ? "" : isSidebarOpen ? "ml-16" : "ml-16"
         }`}
       >
         {/* Navbar (Only Show When Logged In) */}
