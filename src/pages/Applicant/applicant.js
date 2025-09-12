@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch, FaEye, FaUser } from "react-icons/fa";
+import { FaSearch, FaUser } from "react-icons/fa";
 import ApplicantSidebar from "../../components/applicant/applicantSidebar";
 
 const API_URL = "http://localhost/HRMSbackend/get_applicants.php";
@@ -209,14 +209,16 @@ const ApplicantPage = () => {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Position
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Action
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredApplicants.map((applicant, index) => (
-                  <tr key={`${applicant.uid}_${index}`} className="hover:bg-gray-50 transition-colors duration-150">
+                  <tr 
+                    key={`${applicant.uid}_${index}`} 
+                    className="hover:bg-blue-50 cursor-pointer transition-colors duration-200"
+                    onClick={() => handleSelectApplicant(applicant)}
+                    title={`Click to view ${applicant.firstName} ${applicant.lastName}'s details`}
+                  >
                     <td className="px-6 py-4">
                       {renderAvatar(applicant)}
                     </td>
@@ -239,20 +241,11 @@ const ApplicantPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-600">{applicant.position}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <button
-                        onClick={() => handleSelectApplicant(applicant)}
-                        className="text-gray-500 hover:text-blue-600 transition-colors duration-200"
-                        title={`View ${applicant.firstName} ${applicant.lastName}'s details`}
-                      >
-                        <FaEye className="text-xl" />
-                      </button>
-                    </td>
                   </tr>
                 ))}
                 {filteredApplicants.length === 0 && (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500 italic">
+                    <td colSpan="6" className="px-6 py-8 text-center text-gray-500 italic">
                       No Applicants Found
                     </td>
                   </tr>

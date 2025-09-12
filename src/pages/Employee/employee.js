@@ -60,8 +60,8 @@ const EmployeeSidebar = ({ employee, onClose }) => {
   if (!employee) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
-      <div className={`bg-white w-full md:w-[500px] h-full shadow-2xl transform transition-transform duration-300 ${visible ? "translate-x-0" : "translate-x-full"}`}>
+    <div className=" fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
+      <div className={`bg-white w-full w-full h-full shadow-2xl transform transition-transform duration-300 ${visible ? "translate-x-0" : "translate-x-full"}`}>
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-900">Details</h2>
           <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -572,8 +572,8 @@ const EmployeePage = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {["Picture", "Employee ID", "Name", "Department", "Employee Type", "Gender", "Position", "Salary","Date Hired", "Action"].map(header => (
-                  <th key={header} className={`px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider ${header === "Action" ? "text-right" : "text-left"}`}>
+                {["Picture", "Employee ID", "Name", "Department", "Employee Type", "Gender", "Position", "Salary","Date Hired"].map(header => (
+                  <th key={header} className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">
                     {header}
                   </th>
                 ))}
@@ -581,7 +581,11 @@ const EmployeePage = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEmployees.map((employee, index) => (
-                <tr key={employee.id || index} className="hover:bg-gray-50 transition-colors duration-150">
+                <tr 
+                  key={employee.id || index} 
+                  className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                  onClick={() => setSelectedEmployee(employee)}
+                >
                   <td className="px-6 py-4">
                     
                     <img src={employee.ProfilePicture ? `http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
@@ -596,11 +600,6 @@ const EmployeePage = () => {
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Position}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">₱{employee.salary}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.hireDate}</div></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button onClick={() => setSelectedEmployee(employee)} className="text-gray-500 hover:text-blue-600 transition-colors duration-200">
-                      <Eye className="w-5 h-5" />
-                    </button>
-                  </td>
                 </tr>
               ))}
               {filteredEmployees.length === 0 && (
