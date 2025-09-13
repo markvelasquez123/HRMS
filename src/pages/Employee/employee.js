@@ -1,5 +1,6 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import { X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign, Search, Eye, AlertCircle, Carrot } from "lucide-react";
+import { employees } from "../../components/Carousel/emparray";
 
 const initialFormState = {
   idNumber: "", firstName: "", lastName: "", birthDate: "", Position: "", Department: "", hireDate: "",
@@ -549,6 +550,13 @@ const EmployeePage = () => {
                         className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
                       {!formData.ResumeFile && <span className="text-red-500 text-xs">Required</span>}
                     </div>
+                    {/* <div className="space-y-1">
+                      <label className="block text-sm font-medium text-gray-700">Passport *</label>
+                      <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                        onChange={handleResumeFileChange} ref={""} 
+                        className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                      {!formData.ResumeFile && <span className="text-red-500 text-xs">Required</span>}
+                    </div> */}
                   </div>
                 </div>
                 
@@ -585,6 +593,7 @@ const EmployeePage = () => {
                   key={employee.id || index} 
                   className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                   onClick={() => setSelectedEmployee(employee)}
+                  title={`Click to view ${employee.FirstName} ${employee.LastName}'s details`}
                 >
                   <td className="px-6 py-4">
                     

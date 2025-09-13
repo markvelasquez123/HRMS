@@ -64,7 +64,7 @@ const Header = ({isHeaderOpen }) => {
       </div>
 
       {/*restriction happen*/}
-      {(() => {
+      {/* {(() => {
         const isAsiaNavis = company === "asia navis";
         const links = [
           { to: "/Homepage", icon: "home", color: "text-blue-600" },
@@ -125,7 +125,7 @@ const Header = ({isHeaderOpen }) => {
             </ul>
           );
         }
-      })()}
+      })()} */}
 
       <div className="mt-auto w-full flex justify-center px-1 py-4">
         <button

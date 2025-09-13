@@ -171,7 +171,7 @@ export default function ApplicantCharts() {
 
   const getRetentionData = () => {
     const baseData = [
-      { year: 2021, rate: 25, employees: 120, turnover: 15 },
+      { year: 2021, rate: 95, employees: 120, turnover: 15 },
       { year: 2022, rate: 30, employees: 135, turnover: 18 },
       { year: 2023, rate: 35, employees: 150, turnover: 12 },
       { year: 2024, rate: 40, employees: 165, turnover: 10 }

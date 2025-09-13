@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign } from "lucide-react";
 import Logo from "../assets/Mainlogo.png";
+import { Link } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {
   const [profilePic, setProfilePic] = useState("https://i.pinimg.com/736x/93/44/ee/9344ee2e15ea931f5ecbe2b70df8b5ab.jpg");
@@ -91,7 +92,9 @@ const Navbar = ({ toggleSidebar }) => {
           </button>
           <header className="bg-white">
                   <div className="max-w-7xl mx-auto py-4 px-6">
+                    <Link to="/Homepage">
                     <img src={Logo} alt="Logo" className="h-12 " />
+                    </Link>
                   </div>
                 </header>
           
