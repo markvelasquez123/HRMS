@@ -1,177 +1,77 @@
-  import React, { useState, useEffect } from 'react';
-  import { ChevronLeft, ChevronRight } from 'lucide-react';
-  import photo1 from '../../assets/employee1.jpg';
-  import photo2 from '../../assets/employee2.jpg';
-  import photo3 from '../../assets/employee3.jpg';
-  import photo4 from '../../assets/employee4.jpg';
-  import photo5 from '../../assets/employee5.jpg';
-  import photo6 from '../../assets/employee6.jpg';
-  import photo7 from '../../assets/employee7.jpg';
-  import photo8 from '../../assets/employee8.jpg';
-  import photo9 from '../../assets/employee9.jpg';
-  import photo10 from '../../assets/employee10.jpg';
+  // import React, { useState, useEffect } from 'react';
   
   
-  export const employees = [
-    {
-      id: 1,
-      name: "Maria Santos",
-      position: "Chief Executive Officer",
-      age: 45,
-      sex: "Female",
-      photo: photo1
-    },
-    {
-      id: 2,
-      name: "Juan Dela Cruz",
-      position: "Chief Technology Officer",
-      age: 38,
-      sex: "Male",
-      photo: photo2
-    },
-    {
-      id: 3,
-      name: "Ana Rodriguez",
-      position: "HR Director",
-      age: 42,
-      sex: "Female",
-      photo: photo3
-    },
-    {
-      id: 4,
-      name: "Carlos Mendoza",
-      position: "Finance Manager",
-      age: 40,
-      sex: "Male",
-      photo: photo4
-    },
-    {
-      id: 5,
-      name: "Isabel Garcia",
-      position: "Marketing Director",
-      age: 36,
-      sex: "Female",
-      photo: photo5
-    },
-    {
-      id: 6,
-      name: "Roberto Cruz",
-      position: "Operations Manager",
-      age: 44,
-      sex: "Male",
-      photo: photo6
-    },
-    {
-      id: 7,
-      name: "Carmen Reyes",
-      position: "Sales Director",
-      age: 39,
-      sex: "Female",
-      photo: photo7
-    },
-    {
-      id: 8,
-      name: "Miguel Torres",
-      position: "IT Manager",
-      age: 35,
-      sex: "Male",
-      photo: photo8
-    },
-    {
-      id: 9,
-      name: "Sofia Villanueva",
-      position: "Accounting Manager",
-      age: 41,
-      sex: "Female",
-      photo: photo9
-    },
-    {
-      id: 10,
-      name: "Pedro Ramos",
-      position: "Project Manager",
-      age: 37,
-      sex: "Male",
-      photo: photo10
-    },
-    {
-      id: 11,
-      name: "Luz Miranda",
-      position: "Quality Manager",
-      age: 43,
-      sex: "Female",
-      photo: photo1
-    },
-    {
-      id: 12,
-      name: "Antonio Silva",
-      position: "Security Manager",
-      age: 46,
-      sex: "Male",
-      photo: photo2
-    },
-    {
-      id: 13,
-      name: "Rosa Morales",
-      position: "Training Manager",
-      age: 38,
-      sex: "Female",
-      photo: photo3
-    },
-    {
-      id: 14,
-      name: "Francisco Lopez",
-      position: "Logistics Manager",
-      age: 42,
-      sex: "Male",
-      photo: photo4
-    },
-    {
-      id: 15,
-      name: "Elena Castro",
-      position: "Customer Service Manager",
-      age: 34,
-      sex: "Female",
-      photo: photo5
-    },
-    {
-      id: 16,
-      name: "Ricardo Fernandez",
-      position: "Production Manager",
-      age: 45,
-      sex: "Male",
-      photo: photo6
-    },
-    {
-      id: 17,
-      name: "Gloria Herrera",
-      position: "Research Manager",
-      age: 40,
-      sex: "Female",
-      photo: photo7
-    },
-    {
-      id: 18,
-      name: "Manuel Gutierrez",
-      position: "Maintenance Manager",
-      age: 48,
-      sex: "Male",
-      photo: photo8
-    },
-    {
-      id: 19,
-      name: "Cristina Jimenez",
-      position: "Legal Counsel",
-      age: 43,
-      sex: "Female",
-      photo: photo9
-    },
-    {
-      id: 20,
-      name: "Diego Vargas",
-      position: "Business Analyst",
-      age: 33,
-      sex: "Male",
-      photo: photo10
-    }
-  ];
+  
+  
+  // export const employees = [
+  //   {
+  //     part: "Workplace conduct and ethics",
+  //     title: "Professionalism",
+  //     id: 1,
+  //     description: "Employees are expected to act professionally and respectfully toward colleagues, supervisors, clients, and visitors.",
+  //   },
+  //   {
+  //     part: "Workplace conduct and ethics",
+  //     title: "Conflict of Interest",
+  //     id: 2,  
+  //     description: "Employees must avoid personal or financial interests that could interfere with their job duties or the company's best interests.",
+  //   },
+  //   {
+  //     part: "Workplace conduct and ethics",
+  //     title: "Confidentiality",
+  //     id: 3,
+  //     description: "A confidentiality policy protects sensitive company information, including client data, trade secrets, and internal documents.",
+      
+  //   },
+  //   {
+  //     part: "Workplace conduct and ethics",
+  //     title: "Dress code",
+  //     id: 4,
+  //     description: "Defines the expected attire for the workplace, balancing professionalism with comfort.",
+  //   },
+  //   {
+  //     part: "Workplace conduct and ethics",
+  //     title: "Discrimination and harassment",
+  //     id: 5,
+  //     description: " Policies strictly prohibit any form of harassment, discrimination, or victimization based on protected characteristics like race, gender, or religion.",
+     
+  //   },
+  //   {
+  //     part: "Health and safety",
+  //     title: "Workplace safety",
+  //     id: 6,
+  //     description: " Employees must follow all safety protocols to ensure a hazard-free work environment, reporting any incidents or hazards immediately.",
+     
+  //   },
+  //   {
+  //     part: "Health and safety",
+  //     title: "Substance abuse",
+  //     id: 7,
+  //     description: " Strict rules prohibit the use, possession, or distribution of alcohol or illegal drugs on company property or during work hours.",
+     
+  //   },
+  //   {
+  //     part: "Health and safety",
+  //     title: "Smoking",
+  //     id: 8,
+  //     description: " A smoking policy designates areas where employees are allowed to smoke, often restricting it inside all company buildings.",
+     
+  //   },
+  //   {
+  //     part: "Attendance and leave",
+  //     title: "Internet and email",
+  //     id: 9,
+  //     description: " Policies dictate the acceptable use of company internet, email, and internal communication platforms, often restricting personal use.",
+     
+  //   },
+  //   {
+  //     part: "Attendance and leave",
+  //     title: "Personal devices",
+  //     id: 10,
+  //     description: " Guidelines cover the use of personal devices at work, such as smartphones, and may restrict their use during work hours. ",
+     
+  //   },
+    
+    
+  // ];
 

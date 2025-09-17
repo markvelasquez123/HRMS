@@ -2,7 +2,7 @@ import React from "react";
 
 export default function HRMSBanner() {
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white">
+    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-300 text-white">
       
       <div className="absolute inset-0 bg-black bg-opacity-10">
         <div className="absolute inset-0" style={{

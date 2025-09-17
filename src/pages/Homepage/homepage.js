@@ -1,8 +1,8 @@
 import React from "react";
 import MainCards from "../../components/homepage/mainCards";
-import OrgChartCarousel from "../../components/Carousel/employeeChart";
-import HRMSBanner from "../../components/hrmsBanner/banner"; // Updated path
-import Logo from "../../assets/Mainlogo.png";
+import OrgChartCarousel from "../../components/Carousel/rules";
+import HRMSBanner from "../../components/hrmsBanner/banner";
+
 import Navbar from "../../components/navBar";
 
 const HomePage = () => {

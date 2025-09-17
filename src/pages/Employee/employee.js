@@ -1,6 +1,6 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import { X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign, Search, Eye, AlertCircle, Carrot } from "lucide-react";
-import { employees } from "../../components/Carousel/emparray";
+
 
 const initialFormState = {
   idNumber: "", firstName: "", lastName: "", birthDate: "", Position: "", Department: "", hireDate: "",
@@ -493,7 +493,7 @@ const EmployeePage = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-2xl mx-4 sm:mx-auto overflow-y-auto max-h-[90vh]">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Add New Employee By:{accID}</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Add New Employee</h2>
                 <div> 
                   <label>
                     <input 

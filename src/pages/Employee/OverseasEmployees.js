@@ -515,7 +515,7 @@ const OverseasEmployees = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {["Picture", "Employee ID", "Name", "Position", "Email", "Phone", "Date Hired", "Action"].map(header => (
+                {["Picture", "Employee ID", "Name", "Position", "Email", "Phone", "Date Hired"].map(header => (
                   <th key={header} className={`px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider ${header === "Action" ? "text-right" : "text-left"}`}>
                     {header}
                   </th>
@@ -524,7 +524,11 @@ const OverseasEmployees = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEmployees.map((employee, index) => (
-                <tr key={employee.id || index} className="hover:bg-gray-50 transition-colors duration-150">
+                <tr key={employee.id || index} 
+                    className="hover:bg-gray-50 transition-colors duration-150"
+                    onClick={() => setSelectedEmployee(employee)}
+                    title={`Click to view details of ${employee.firstName} ${employee.lastName}`}
+                    >
                   <td className="px-6 py-4">
                     <img 
                       src={getProfilePictureUrl(employee)} 
@@ -557,15 +561,6 @@ const OverseasEmployees = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-600">{employee.dateHired}</div>
-                  </td>
-                  
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button 
-                      onClick={() => setSelectedEmployee(employee)} 
-                      className="text-gray-500 hover:text-blue-600 transition-colors duration-200"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
                   </td>
                 </tr>
               ))}
