@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch, FaUser } from "react-icons/fa";
 import ApplicantSidebar from "../../components/applicant/applicantSidebar";
-
+import importExcel from "../../components/Excelimport/importExcel";
 const API_URL = "http://localhost/HRMSbackend/get_applicants.php";
 
 const ApplicantPage = () => {
@@ -148,6 +148,9 @@ const ApplicantPage = () => {
       applicant.lastName?.toLowerCase().includes(searchLower)
     );
   });
+  const handleExport = () => {
+    importExcel(filteredApplicants, 'Applicants');
+  };
 
   return (
     <div className="relative min-h-screen bg-gray-50 overflow-x-hidden">
@@ -166,6 +169,10 @@ const ApplicantPage = () => {
           <h2 className="text-2xl font-semibold text-gray-800">Applicant</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
+              <button className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
+              onClick={handleExport}>
+              Export Excel File
+            </button>
               <input
                 type="text"
                 placeholder="Search by Name"

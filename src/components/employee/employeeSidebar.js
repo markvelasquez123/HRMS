@@ -110,13 +110,13 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
 
   
   const mockEmployee = employee || {
-    firstName: "John",
-    lastName: "Doe",
-    position: "Software Engineer",
+    FirstName: "John",
+    LastName: "Doe",
+    PositionApplied: "Software Engineer",
     status: "Active",
-    idNumber: "EMP001",
-    phone: "+63 912 345 6789",
-    email: "john.doe@company.com",
+    IDNumber: "EMP001",
+    ContactNumber: "+63 912 345 6789",
+    EmailAddress: "john.doe@company.com",
     gender: "Male",
     street1: "123 Main Street",
     city: "Manila",
@@ -224,7 +224,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
                         {currentEmployee.status || "Active"}
                       </span>
                       <span className="text-sm text-gray-500">
-                        ID: {currentEmployee.idNumber || "N/A"}
+                        ID: {currentEmployee.IDNumber || "N/A"}
                       </span>
                     </div>
                   </div>
@@ -294,11 +294,7 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Address</p>
                         <p className="text-gray-800 font-medium">
                           {[
-                            currentEmployee.street1,
-                            currentEmployee.street2,
-                            currentEmployee.city,
-                            currentEmployee.state,
-                            currentEmployee.zip
+                            currentEmployee.HomeAddress
                           ].filter(Boolean).join(", ") || "N/A"}
                         </p>
                       </div>

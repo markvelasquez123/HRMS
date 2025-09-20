@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Search, Eye, User, X, Mail, Phone, Briefcase, Building, Cake, MapPin, Calendar, ChevronDown, CreditCard } from "lucide-react";
-
+import importExcel from "../../components/Excelimport/importExcel";
 const EmployeeSidebar = ({ employee, onClose, onStatusUpdate }) => {
   const [visible, setVisible] = useState(false);
 
@@ -485,6 +485,9 @@ const OverseasEmployees = () => {
       </div>
     </div>
   );
+  const handleExport = () => {
+    importExcel(filteredEmployees, 'Overseas_Employees');
+  };
 
   return (
     <div className="relative min-h-screen bg-gray-50 overflow-x-hidden">
@@ -500,6 +503,10 @@ const OverseasEmployees = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <h2 className="text-2xl font-semibold text-gray-800">Overseas Filipino Workers</h2>
           <div className="relative">
+            <button className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
+              onClick={handleExport}>
+              Export Excel File
+            </button>
             <input 
               type="text" 
               placeholder="Search employees..." 
@@ -507,6 +514,7 @@ const OverseasEmployees = () => {
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)} 
             />
+            
             <Search className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
           </div>
         </div>

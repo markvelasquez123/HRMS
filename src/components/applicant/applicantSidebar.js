@@ -683,15 +683,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
                 </label>
               </div>
             </div>
-
-            {isEmployee && (
-              <div className="space-y-4">
-                {renderDropdown("Employee Type", Briefcase, employeeType, employeeTypes, dropdownVisible, setDropdownVisible, setEmployeeType)}
-                {renderDropdown("Department", Building, department, departments, departmentDropdownVisible, setDepartmentDropdownVisible, setDepartment)}
-              </div>
-            )}
-
-           
             {isEmployee && (
               <div className="space-y-4">
                 {renderDropdown("Employee Type", Briefcase, employeeType, employeeTypes, dropdownVisible, setDropdownVisible, setEmployeeType)}

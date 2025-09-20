@@ -15,7 +15,7 @@ const MainCards = () => {
         
         // Fetch employees from the backend
         const employeeResponse = await axios.get(
-          "http://localhost/HRMSbackend/employee.php?action=get",
+          "http://localhost/HRMSbackend/test.php?action=get",
           {
             headers: {
               "Content-Type": "application/json",

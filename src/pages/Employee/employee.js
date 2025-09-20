@@ -1,13 +1,12 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import { X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign, Search, Eye, AlertCircle, Carrot } from "lucide-react";
+import ExcelImport from "../../components/Excelimport/importExcel";
 
 
 const initialFormState = {
-  idNumber: "", firstName: "", lastName: "", birthDate: "", Position: "", Department: "", hireDate: "",
-  ProfilePicture: null, ResumeFile: null, email: "", phone: "", gender: "", employeeType: "", company: "",
-  street1: "", street2: "", city: "", state: "", zip: "", salary: ""
-  
-  
+  IDNumber: "", FirstName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
+  ProfilePicture: null, ResumeFile: null, EmailAddress: "", ContactNumber: "", Gender: "", EmployeeType: "", Company: "",
+  HomeAddress: "", Salary: ""
 };
 
 function formReducer(state, action) {
@@ -84,23 +83,23 @@ const EmployeeSidebar = ({ employee, onClose }) => {
 
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
-              <div className="flex items-center text-sm"><Mail className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{employee.email}</span></div>
-              <div className="flex items-center text-sm"><Phone className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{employee.phone}</span></div>
+              <div className="flex items-center text-sm"><Mail className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{employee.EmailAddress}</span></div>
+              <div className="flex items-center text-sm"><Phone className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{employee.ContactNumber}</span></div>
               <div className="flex items-start text-sm">
                 <MapPin className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-900 leading-relaxed">{employee.street1}{employee.street2 ? `, ${employee.street2}` : ''}, {employee.city}, {employee.state} {employee.zip}</span>
+                <span className="text-gray-900 leading-relaxed">{employee.HomeAddress}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-blue-50 rounded-lg p-4">
                 <div className="flex items-center mb-2"><Cake className="w-4 h-4 text-blue-600 mr-2" /><span className="text-sm font-medium text-blue-900">Birth Date</span></div>
-                <span className="text-sm text-blue-800">{employee.birthDate}</span>
+                <span className="text-sm text-blue-800">{employee.Birthdate}</span>
               </div>
-              {employee.gender && (
+              {employee.Gender && (
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="flex items-center mb-2"><User className="w-4 h-4 text-purple-600 mr-2" /><span className="text-sm font-medium text-purple-900">Gender</span></div>
-                  <span className="text-sm text-purple-800">{employee.gender}</span>
+                  <span className="text-sm text-purple-800">{employee.Gender}</span>
                 </div>
               )}
             </div>
@@ -109,12 +108,12 @@ const EmployeeSidebar = ({ employee, onClose }) => {
               <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><Briefcase className="w-4 h-4 mr-2" />Employment Information</h4>
               <div className="space-y-3">
                 {[
-                  { icon: IdCard, label: "Employee ID", value: employee.idNumber },
-                  { icon: Building, label: "Type", value: employee.employeeType },
-                  { icon: Carrot, label: "Type", value: employee.company },
+                  { icon: IdCard, label: "Employee ID", value: employee.IDNumber },
+                  { icon: Building, label: "Type", value: employee.EmployeeType },
+                  { icon: Carrot, label: "Type", value: employee.Company },
 
                   { icon: DollarSign, label: "Salary", value: `₱${employee.salary}`, className: "text-green-600" },
-                  { icon: Cake, label: "Hire Date", value: employee.hireDate }
+                  { icon: Cake, label: "Hire Date", value: employee.DateHired }
                 ].map(({ icon: Icon, label, value, className = "text-gray-900" }) => (
                   <div key={label} className="flex items-center justify-between">
                     <div className="flex items-center text-sm"><Icon className="w-4 h-4 text-gray-500 mr-2" /><span className="text-gray-600">{label}</span></div>
@@ -154,14 +153,14 @@ const EmployeePage = () => {
   const [success, setSuccess] = useState(null);
   const profilePicRef = useRef(null);
   const resumeFileRef = useRef(null);
-  const [fieldErrors, setFieldErrors] = useState({ idNumber: "", firstName: "", lastName: "", Position: "", phone: "", salary: "" });
+  const [fieldErrors, setFieldErrors] = useState({ IDNumber: "", firstName: "", lastName: "", Position: "", phone: "", salary: "" });
   const [accID, setaccID] = useState();
   const [isChecked, setIsChecked] = useState(false);
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering"];
-  const basicFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "gender", "employeeType", "company", "salary"];
-  const contactFields = ["email", "phone"];
-  const addressFields = ["street1", "street2", "city", "state", "zip"];
+  const basicFields = ["IDNumber", "FirstName", "LastName", "BirthDate", "PositionApplied", "Department", "DateHired", "gender", "EmployeeType", "Company", "salary"];
+  const contactFields = ["EmailAddress", "ContactNumber"];
+  const addressFields = ["HomeAddress"];
 
 
 
@@ -184,14 +183,19 @@ const EmployeePage = () => {
     return;
   }
     
-  }
+  };
   
 
-  
-
+  // const Data =  () => { 
+  //   const employeedata = {
+  //     idNumber: "Employee ID", firstName: "First Name", lastName: "Last Name", hireDate: "Hire Date",
+  //     birthDate: "Birth Date", employeeType: "Employee Type", company: "Company", Position: "Position", Department: "Department", salary: "Salary",
+  //     accid: "Account ID",
+  //   };
+  // };
   const loadEmployees = async () => {
     try {
-      const response = await fetch('http://localhost/HRMSbackend/employee.php?action=get');
+      const response = await fetch('http://localhost/HRMSbackend/test.php?action=get');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
@@ -213,8 +217,8 @@ const EmployeePage = () => {
     const { name, value } = e.target;
     let error = "";
     
-    if ((name === "idNumber" || name === "phone") && !isOnlyNumbers(value)) error = "Only numbers are allowed.";
-    if ((name === "firstName" || name === "lastName" || name === "Position") && !isOnlyLetters(value)) error = "Only letters are allowed.";
+    if ((name === "IDNumber" || name === "ContactNumber") && !isOnlyNumbers(value)) error = "Only numbers are allowed.";
+    if ((name === "FirstName" || name === "LastName" || name === "PositionApplied") && !isOnlyLetters(value)) error = "Only letters are allowed.";
     if (name === "salary" && value && !isValidDecimal(value)) error = "Only numbers and decimal points are allowed.";
     
     setFieldErrors(la => ({ ...la, [name]: error }));
@@ -251,17 +255,17 @@ const EmployeePage = () => {
   };
 
   const isFormValid = () => {
-  const requiredFields = ["idNumber", "firstName", "lastName", "birthDate", "Position", "Department", "hireDate", "email", "phone", "gender", "employeeType", "company", "street1", "city", "state", "zip", "salary"];
+  const requiredFields = ["IDNumber", "FirstName", "LastName", "BirthDate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "gender", "EmployeeType", "company", "HomeAdress", "salary"];
     
     const textAndDateValid = requiredFields.every((field) => {
-      if (field === "birthDate" || field === "hireDate") {
+      if (field === "BirthDate" || field === "DateHired") {
         const dateValue = formData[field];
         return dateValue && !isNaN(new Date(dateValue).getTime());
       }
-      if (field === "idNumber" && !isOnlyNumbers(formData[field])) return false;
-      if (field === "phone" && !isOnlyNumbers(formData[field])) return false;
+      if (field === "IDNumber" && !isOnlyNumbers(formData[field])) return false;
+      if (field === "ContactNumber" && !isOnlyNumbers(formData[field])) return false;
       if (field === "salary" && (!formData[field] || !isValidDecimal(formData[field]))) return false;
-      if ((field === "firstName" || field === "lastName" || field === "Position") && !isOnlyLetters(formData[field])) return false;
+      if ((field === "FirstName" || field === "LastName" || field === "PositionApplied") && !isOnlyLetters(formData[field])) return false;
       if (field === "company" && (!formData.company || formData.company === "")) return false;
       return formData[field] && formData[field].toString().trim() !== "";
     });
@@ -272,7 +276,7 @@ const EmployeePage = () => {
   const resetForm = () => {
     setShowForm(false);
     dispatch({ type: "RESET" });
-    setFieldErrors({ idNumber: "", firstName: "", lastName: "", Position: "", phone: "", salary: "" });
+    setFieldErrors({ IDNumber: "", FirstName: "", LastName: "", PositionApplied: "", ContactNumber: "", salary: "" });
     if (profilePicRef.current) profilePicRef.current.value = "";
     if (resumeFileRef.current) resumeFileRef.current.value = "";
     setError(null);
@@ -330,10 +334,10 @@ const EmployeePage = () => {
               headers: { "Content-Type": "application/json" },
               credentials: "include",
               body: JSON.stringify({
-                name: `${formData.firstName} ${formData.lastName}`,
-                email: formData.email,
+                name: `${formData.FirstName} ${formData.LastName}`,
+                email: formData.EmailAddress,
                 password: "123123",
-                company: formData.company
+                company: formData.Company
               })
             });
             const signupJson = await signupResp.json();
@@ -365,13 +369,14 @@ const EmployeePage = () => {
         employee.LastName?.toLowerCase().includes(searchQuery.toLowerCase())) &&
       (selectedDepartment === "" || employee.Department === selectedDepartment)
     );
+
   });
   
 
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
-      idNumber: "Employee ID", firstName: "First Name", lastName: "Last Name", hireDate: "Hire Date",
-      birthDate: "Birth Date", employeeType: "Employee Type", company: "Company", Position: "Position", Department: "Department", salary: "Salary",
+      IDNumber: "Employee ID", FirstName: "First Name", LastName: "Last Name", DateHired: "Hire Date",
+      Birthdate: "Birth Date", EmployeeType: "Employee Type", company: "Company", PositionApplied: "Position", Department: "Department", salary: "Salary",
       accid: "Account ID",
     };
     const label = labelMap[field] || field.replace(/([A-Z])/g, " $1").trim();
@@ -396,7 +401,7 @@ const EmployeePage = () => {
       );
     }
     
-    if (field === "employeeType") {
+    if (field === "EmployeeType") {
       return (
         <div key={field} className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Employee Type *</label>
@@ -413,7 +418,7 @@ const EmployeePage = () => {
           <label className="block text-sm font-medium text-gray-700">Company *</label>
           <select
             name="company"
-            value={formData.company || ""}
+            value={formData.Company || ""}
             onChange={handleChange}
             className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required={isRequired}
@@ -451,14 +456,33 @@ const EmployeePage = () => {
           type={field.includes("Date") ? "date" : field === "email" ? "email" : field === "phone" ? "tel" : field === "salary" ? "number" : "text"}
           step={field === "salary" ? "0.01" : undefined}
           min={field === "salary" ? "0" : undefined}
-          inputMode={(field === "idNumber" || field === "phone") ? "numeric" : field === "salary" ? "decimal" : undefined}
-          pattern={(field === "idNumber" || field === "phone") ? "[0-9]*" : undefined}
+          inputMode={(field === "IDNumber" || field === "ContactNumber") ? "numeric" : field === "salary" ? "decimal" : undefined}
+          pattern={(field === "IDNumber" || field === "ContactNumber") ? "[0-9]*" : undefined}
         />
         {fieldErrors[field] && <span className="text-red-500 text-xs">{fieldErrors[field]}</span>}
       </div>
-    );
-  };
+      
+    )
+    
+  
+   
+  
 
+  };
+    const handleExport = () => {
+      let datatoexport;
+      if (selectedDepartment) {
+        datatoexport = employeeList.filter(
+          (employee) => employee.Department === selectedDepartment
+        );
+      }else {
+        datatoexport = employeeList;
+      }
+
+      ExcelImport( datatoexport, "Employee List" + (selectedDepartment ? ` - ${selectedDepartment}` : ''));
+    };
+
+    
   return (
     <div className="relative min-h-screen bg-gray-50 overflow-x-hidden">
       {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
@@ -470,11 +494,16 @@ const EmployeePage = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">Employees</h2>
           <div className="flex items-center gap-4">
+            
             <select className="border border-gray-300 p-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-200" 
               value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
               <option value="">Departments</option>
               {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
             </select>
+            <button className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+              onClick={handleExport}>
+              Export Excel File
+              </button>
             <div className="relative">
               <input type="text" placeholder="Name" 
                 className="border border-gray-300 p-2 pl-10 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-200" 
@@ -600,15 +629,15 @@ const EmployeePage = () => {
                     <img src={employee.ProfilePicture ? `http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
                       alt={`${employee.FirstName} ${employee.LastName}`} className="h-12 w-12 rounded-full object-cover border-2 border-gray-200" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{employee.idNumber}</div></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{employee.IDNumber}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{employee.FirstName} {employee.LastName}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Department}</div></td>
-                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.employeeType}</div></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.EmployeeType}</div></td>
 
-                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.gender}</div></td>
-                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Position}</div></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Gender}</div></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.PositionApplied}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">₱{employee.salary}</div></td>
-                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.hireDate}</div></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.DateHired}</div></td>
                 </tr>
               ))}
               {filteredEmployees.length === 0 && (
