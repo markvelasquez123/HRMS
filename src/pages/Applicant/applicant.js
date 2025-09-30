@@ -68,20 +68,20 @@ const ApplicantPage = () => {
         const mergedApplicants = responseData.summary.map((summary, index) => {
           
           const details = responseData.details?.find(detail => 
-            (detail.email && detail.email === summary.email) ||
-            (detail.firstName === summary.firstName && 
-             detail.lastName === summary.lastName)
+            (detail.EmailAddress && detail.EmailAddress === summary.EmailAddress) ||
+            (detail.FirstName === summary.FirstName && 
+             detail.LastName === summary.LastName)
           ) || {};
 
           return {
             ...summary,
             ...details,
-            uid: summary.email || `applicant_${index}`,
-            firstName: summary.firstName || "N/A",
-            lastName: summary.lastName || "N/A",
-            email: summary.email || "N/A",
-            phone: summary.phone || details.phone || "N/A",
-            position: summary.position || details.position || "N/A"
+            uid: summary.EmailAddress || `applicant_${index}`,
+            firstName: summary.FirstName || "N/A",
+            lastName: summary.LastName || "N/A",
+            email: summary.EmailAddress || "N/A",
+            phone: summary.ContactNumber || details.ContactNumber || "N/A",
+            position: summary.PositionApplied || details.PositionApplied || "N/A"
           };
         });
 
@@ -108,16 +108,16 @@ const ApplicantPage = () => {
   };
 
   const renderAvatar = (applicant) => {
-    if (applicant?.avatar && applicant.avatar.trim() !== '') {
-      const avatarUrl = applicant.avatar.startsWith('http') 
-        ? applicant.avatar 
-        : `http://localhost/HRMSbackend/${applicant.avatar}`;
+    if (applicant?.ProfilePicture && applicant.ProfilePicture.trim() !== '') {
+      const avatarUrl = applicant.ProfilePicture.startsWith('http') 
+        ? applicant.ProfilePicture 
+        : `http://localhost/HRMSbackend/${applicant.ProfilePicture}`;
       
       return (
         <div className="relative">
           <img 
             src={avatarUrl}
-            alt={`${applicant.firstName} ${applicant.lastName}`}
+            alt={`${applicant.FirstName} ${applicant.LastName}`}
             className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
             onError={(e) => {
               e.target.style.display = 'none';
@@ -144,8 +144,8 @@ const ApplicantPage = () => {
   const filteredApplicants = applicants.filter((applicant) => {
     const searchLower = searchQuery.toLowerCase();
     return (
-      applicant.firstName?.toLowerCase().includes(searchLower) ||
-      applicant.lastName?.toLowerCase().includes(searchLower)
+      applicant.FirstName?.toLowerCase().includes(searchLower) ||
+      applicant.LastName?.toLowerCase().includes(searchLower)
     );
   });
   const handleExport = () => {
@@ -224,7 +224,7 @@ const ApplicantPage = () => {
                     key={`${applicant.uid}_${index}`} 
                     className="hover:bg-blue-50 cursor-pointer transition-colors duration-200"
                     onClick={() => handleSelectApplicant(applicant)}
-                    title={`Click to view ${applicant.firstName} ${applicant.lastName}'s details`}
+                    title={`Click to view ${applicant.FirstName} ${applicant.LastName}'s details`}
                   >
                     <td className="px-6 py-4">
                       {renderAvatar(applicant)}
@@ -236,17 +236,17 @@ const ApplicantPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {applicant.firstName} {applicant.lastName}
+                        {applicant.FirstName} {applicant.LastName}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{applicant.email}</div>
+                      <div className="text-sm text-gray-600">{applicant.EmailAddress}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{applicant.phone}</div>
+                      <div className="text-sm text-gray-600">{applicant.ContactNumber}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{applicant.position}</div>
+                      <div className="text-sm text-gray-600">{applicant.PositionApplied}</div>
                     </td>
                   </tr>
                 ))}

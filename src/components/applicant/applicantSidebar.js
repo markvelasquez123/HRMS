@@ -43,15 +43,15 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         const data = await res.json();
         
         const foundApplicant = data.details?.find(detail => {
-          if (initialApplicant.email && detail.email) {
-            return detail.email.toLowerCase() === initialApplicant.email.toLowerCase();
+          if (initialApplicant.EmailAddress && detail.EmailAddress) {
+            return detail.EmailAddress.toLowerCase() === initialApplicant.EmailAddress.toLowerCase();
           }
           
           return (
-            detail.firstName && detail.lastName && detail.position &&
-            detail.firstName.toLowerCase() === initialApplicant.firstName?.toLowerCase() &&
-            detail.lastName.toLowerCase() === initialApplicant.lastName?.toLowerCase() &&
-            detail.position.toLowerCase() === initialApplicant.position?.toLowerCase()
+            detail.FirstName && detail.LastName && detail.PositionApplied &&
+            detail.FirstName.toLowerCase() === initialApplicant.FirstName?.toLowerCase() &&
+            detail.LastName.toLowerCase() === initialApplicant.LastName?.toLowerCase() &&
+            detail.PositionApplied.toLowerCase() === initialApplicant.PositionApplied?.toLowerCase()
           );
         });
         
@@ -98,10 +98,10 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       console.log('insertToPool called with:', { applicantData, statusValue });
       
       const poolData = {
-        name: `${applicantData.firstName} ${applicantData.lastName}`,
-        position: applicantData.position,
+        name: `${applicantData.FirstName} ${applicantData.LastName}`,
+        position: applicantData.PositionApplied,
         department: department || 'Unassigned',
-        phone: applicantData.phone || '',
+        phone: applicantData.ContactNumber || '',
         status: statusValue
       };
 
@@ -161,34 +161,28 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
     try {
       if (isOFW) {
         const ofwData = {
-          firstName: applicant.firstName,
-          lastName: applicant.lastName,
-          email: applicant.email,
-          phone: applicant.phone,
-          position: applicant.position,
+          FirstName: applicant.FirstName,
+          LastName: applicant.LastName,
+          EmailAddress: applicant.EmailAddress,
+          ContactNumber: applicant.ContactNumber,
+          PositionApplied: applicant.PositionApplied,
           department: "OFW",
           employeeType: "OFW",
           dateHired: new Date().toISOString().split('T')[0],
-          birthDay: applicant.birthDay,
-          birthMonth: applicant.birthMonth,
-          birthYear: applicant.birthYear,
-          gender: applicant.gender,
-          street1: applicant.street1,
-          street2: applicant.street2 || "",
-          city: applicant.city,
-          state: applicant.state,
-          zip: applicant.zip,
-          profilePicture: applicant.avatar,
-          resumeUrl: applicant.resumeUrl,
-          passport: applicant.passport,
-          diploma: applicant.diploma,
-          tor: applicant.tor,
-          medical: applicant.medical,
-          tinId: applicant.tinId,
-          nbiClearance: applicant.nbiClearance,
-          policeClearance: applicant.policeClearance,
-          pagibigNumber: applicant.pagibigNumber,
-          philhealthNumber: applicant.philhealthNumber,
+          BirthDate: applicant.BirthDate,
+          Gender: applicant.Gender,
+          HomeAddress: applicant.HomeAddress,
+          ProfilePicture: applicant.ProfilePicture,
+          Resume: applicant.Resume,
+          Passport: applicant.Passport,
+          Diploma: applicant.Diploma,
+          Tor: applicant.Tor,
+          Medical: applicant.Medical,
+          TinID: applicant.TinID,
+          NBIClearance: applicant.NBIClearance,
+          PoliceClearance: applicant.PoliceClearance,
+          PagIbig: applicant.PagIbig,
+          PhilHealth: applicant.PhilHealth,
           // Add interview data
           interviewDate,
           interviewStatus,
@@ -278,25 +272,19 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         }
       } else {
         const employeeData = {
-          firstName: applicant.firstName,
-          lastName: applicant.lastName,
-          email: applicant.email,
-          phone: applicant.phone,
-          position: applicant.position,
+          FirstName: applicant.FirstName,
+          LastName: applicant.LastName,
+          EmailAddress: applicant.EmailAddress,
+          ContactNumber: applicant.ContactNumber,
+          PositionApplied: applicant.PositionApplied,
           department: department,
           employeeType: employeeType,
           dateHired: new Date().toISOString(),
-          birthDay: applicant.birthDay,
-          birthMonth: applicant.birthMonth,
-          birthYear: applicant.birthYear,
-          gender: applicant.gender,
-          street1: applicant.street1,
-          street2: applicant.street2 || "",
-          city: applicant.city,
-          state: applicant.state,
-          zip: applicant.zip,
-          avatar: applicant.avatar,
-          resumeUrl: applicant.resumeUrl,
+          BirthDate: applicant.BirthDate,
+          Gender: applicant.Gender,
+          HomeAddress: applicant.HomeAddress,
+          ProfilePicture: applicant.ProfilePicture,
+          Resume: applicant.Resume,
           // Add interview data
           interviewDate,
           interviewStatus,
@@ -386,7 +374,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email: applicant.email })
+        body: JSON.stringify({ EmailAddress: applicant.EmailAddress })
       });
       const deleteResponse = await deleteResult.json();
       if (!deleteResult.ok || !deleteResponse.success) {
@@ -398,7 +386,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       window.dispatchEvent(new CustomEvent("refreshApplicants"));
       window.dispatchEvent(new CustomEvent("applicantStatusChange", {
         detail: { 
-          applicantId: applicant.uid || applicant.email,
+          applicantId: applicant.uid || applicant.EmailAddress,
           status: "Rejected"
         }
       }));
@@ -423,10 +411,10 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   };
 
   const getAvatarDisplay = () => {
-    if (applicant?.avatar) {
-      const avatarUrl = applicant.avatar.startsWith('http') 
-        ? applicant.avatar 
-        : `http://localhost/HRMSbackend/${applicant.avatar}`;
+    if (applicant?.ProfilePicture) {
+      const avatarUrl = applicant.ProfilePicture.startsWith('http') 
+        ? applicant.ProfilePicture
+        : `http://localhost/HRMSbackend/${applicant.ProfilePicture}`;
       
       return (
         <div className="flex justify-center">
@@ -458,22 +446,22 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering"];
 
   const contactInfo = [
-    { icon: Mail, text: applicant.email },
-    { icon: Phone, text: applicant.phone },
-    { icon: MapPin, text: `${applicant.street1} ${applicant.street2 ? `, ${applicant.street2}` : ''}, ${applicant.city}, ${applicant.state} ${applicant.zip}` }
+    { icon: Mail, text: applicant.EmailAddress },
+    { icon: Phone, text: applicant.ContactNumber },
+    { icon: MapPin, text: `${applicant.HomeAddress},` }
   ];
 
   const documents = [
-    { label: "Resume", url: applicant.resumeUrl },
-    { label: "Passport", url: applicant.passport },
-    { label: "Diploma", url: applicant.diploma },
-    { label: "TOR", url: applicant.tor },
-    { label: "Medical Certificate", url: applicant.medical },
-    { label: "TIN ID", url: applicant.tinId },
-    { label: "NBI Clearance", url: applicant.nbiClearance },
-    { label: "Police Clearance", url: applicant.policeClearance },
-    { label: "Pag-IBIG Number", url: applicant.pagibigNumber },
-    { label: "PhilHealth Number", url: applicant.philhealthNumber },
+    { label: "Resume", url: applicant.Resume },
+    { label: "Passport", url: applicant.Passport },
+    { label: "Diploma", url: applicant.Diploma },
+    { label: "TOR", url: applicant.Tor },
+    { label: "Medical Certificate", url: applicant.Medical },
+    { label: "TIN ID", url: applicant.TinID },
+    { label: "NBI Clearance", url: applicant.NBIClearance },
+    { label: "Police Clearance", url: applicant.PoliceClearance },
+    { label: "Pag-IBIG Number", url: applicant.PagIbig },
+    { label: "PhilHealth Number", url: applicant.PhilHealth },
   ].filter(({ url }) => url);
 
   const renderDropdown = (label, icon, value, options, isVisible, setVisible, setValue) => (
@@ -545,9 +533,9 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
               {getAvatarDisplay()}
               <div className="mt-4">
                 <h3 className="text-xl font-semibold text-gray-900">
-                  {applicant.firstName} {applicant.lastName}
+                  {applicant.FirstName} {applicant.LastName}
                 </h3>
-                <p className="text-sm text-blue-600 font-medium mt-1">{applicant.position}</p>
+                <p className="text-sm text-blue-600 font-medium mt-1">{applicant.PositionApplied}</p>
                 <div className={`inline-block px-3 py-1 mt-3 rounded-full border text-sm font-medium ${getStatusBadgeClass()}`}>
                   {status}
                 </div>
@@ -571,17 +559,17 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
                   <span className="text-sm font-medium text-blue-900">Birthday</span>
                 </div>
                 <span className="text-sm text-blue-800">
-                  {applicant.birthMonth}/{applicant.birthDay}/{applicant.birthYear}
+                  {applicant.BirthDate}
                 </span>
               </div>
               
-              {applicant.gender && (
+              {applicant.Genderender && (
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <User className="w-4 h-4 text-purple-600 mr-2" />
                     <span className="text-sm font-medium text-purple-900">Gender</span>
                   </div>
-                  <span className="text-sm text-purple-800">{applicant.gender}</span>
+                  <span className="text-sm text-purple-800">{applicant.Gender}</span>
                 </div>
               )}
             </div>
