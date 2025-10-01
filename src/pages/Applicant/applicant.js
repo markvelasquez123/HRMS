@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaSearch, FaUser } from "react-icons/fa";
 import ApplicantSidebar from "../../components/applicant/applicantSidebar";
-import importExcel from "../../components/Excelimport/importExcel";
+import importExcel from "../../components/Excelimport/importExcel"; 
+
 const API_URL = "http://localhost/HRMSbackend/get_applicants.php";
 
 const ApplicantPage = () => {
@@ -10,49 +11,30 @@ const ApplicantPage = () => {
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [removedApplicants, setRemovedApplicants] = useState([]);
+  const [imageErrors, setImageErrors] = useState({});
 
-  useEffect(() => {
-    const handleRefresh = () => {
-      fetchApplicants();
-    };
+  const [currentPage, setCurrentPage] = useState(1);
+  const [applicantsPerPage] = useState(15);
 
-    const handleApplicantStatusChange = (event) => {
-      const { applicantId, status } = event.detail;
-
-      if (status === "Accepted" || status === "Rejected") {
-        setApplicants((currentApplicants) =>
-          currentApplicants.filter((applicant) => applicant.uid !== applicantId)
-        );
-
-        const removedApplicants =
-          JSON.parse(localStorage.getItem("removedApplicants")) || [];
-
-        if (!removedApplicants.includes(applicantId)) {
-          removedApplicants.push(applicantId);
-          localStorage.setItem("removedApplicants", JSON.stringify(removedApplicants));
-        }
-      }
-    };
-
-    window.addEventListener("refreshApplicants", handleRefresh);
-    window.addEventListener("applicantStatusChange", handleApplicantStatusChange);
-
-    fetchApplicants();
-
-    return () => {
-      window.removeEventListener("refreshApplicants", handleRefresh);
-      window.removeEventListener("applicantStatusChange", handleApplicantStatusChange);
-    };
-  }, []);
+  const hasFetchedRef = useRef(false); // Track if we've already fetched
+  const isFetchingRef = useRef(false); // Prevent concurrent fetches
 
   const fetchApplicants = async () => {
+    // Prevent duplicate fetches
+    if (isFetchingRef.current) {
+      console.log("Already fetching, skipping...");
+      return;
+    }
+    
     try {
+      isFetchingRef.current = true;
       setLoading(true);
+      console.log("Fetching applicants...");
+      
       const response = await fetch(API_URL, {
         method: 'GET',
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: 'include'
       });
 
@@ -61,18 +43,14 @@ const ApplicantPage = () => {
       }
 
       const responseData = await response.json();
-      console.log('API Response:', responseData);
-
+      console.log("Received data:", responseData);
+      
       if (responseData && Array.isArray(responseData.summary)) {
-        
         const mergedApplicants = responseData.summary.map((summary, index) => {
-          
           const details = responseData.details?.find(detail => 
             (detail.EmailAddress && detail.EmailAddress === summary.EmailAddress) ||
-            (detail.FirstName === summary.FirstName && 
-             detail.LastName === summary.LastName)
+            (detail.FirstName === summary.FirstName && detail.LastName === summary.LastName)
           ) || {};
-
           return {
             ...summary,
             ...details,
@@ -84,7 +62,8 @@ const ApplicantPage = () => {
             position: summary.PositionApplied || details.PositionApplied || "N/A"
           };
         });
-
+        
+        console.log("Setting applicants, count:", mergedApplicants.length);
         setApplicants(mergedApplicants);
         setError("");
       } else if (responseData.error) {
@@ -100,40 +79,91 @@ const ApplicantPage = () => {
       setApplicants([]);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   };
+
+  // Main useEffect for initial fetch only
+  useEffect(() => {
+    // Only fetch once on mount
+    if (!hasFetchedRef.current) {
+      console.log("Initial mount - fetching data");
+      hasFetchedRef.current = true;
+      fetchApplicants();
+    }
+
+    // Cleanup function
+    return () => {
+      console.log("Component unmounting or re-rendering");
+    };
+  }, []); // Empty dependency array - only run once
+
+  // Separate useEffect for event listeners
+  useEffect(() => {
+    const handleRefresh = () => {
+      console.log("Refresh event triggered");
+      fetchApplicants();
+    };
+
+    const handleApplicantStatusChange = (event) => {
+      console.log("Status change event:", event.detail);
+      const { applicantId, status } = event.detail;
+      if (status === "Accepted" || status === "Rejected") {
+        setApplicants((currentApplicants) => {
+          const filtered = currentApplicants.filter((applicant) => applicant.uid !== applicantId);
+          console.log("Filtered applicants, count:", filtered.length);
+          return filtered;
+        });
+        
+        setRemovedApplicants((prev) => {
+          if (!prev.includes(applicantId)) {
+            return [...prev, applicantId];
+          }
+          return prev;
+        });
+      }
+    };
+
+    window.addEventListener("refreshApplicants", handleRefresh);
+    window.addEventListener("applicantStatusChange", handleApplicantStatusChange);
+
+    return () => {
+      window.removeEventListener("refreshApplicants", handleRefresh);
+      window.removeEventListener("applicantStatusChange", handleApplicantStatusChange);
+    };
+  }, []); // Empty dependency array
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    if (searchQuery !== "") {
+      setCurrentPage(1);
+    }
+  }, [searchQuery]);
 
   const handleSelectApplicant = (applicant) => {
     setSelectedApplicant(applicant);
   };
 
   const renderAvatar = (applicant) => {
-    if (applicant?.ProfilePicture && applicant.ProfilePicture.trim() !== '') {
+    const hasError = imageErrors[applicant.uid];
+    
+    if (applicant?.ProfilePicture && applicant.ProfilePicture.trim() !== '' && !hasError) {
       const avatarUrl = applicant.ProfilePicture.startsWith('http') 
         ? applicant.ProfilePicture 
         : `http://localhost/HRMSbackend/${applicant.ProfilePicture}`;
-      
       return (
         <div className="relative">
           <img 
             src={avatarUrl}
-            alt={`${applicant.FirstName} ${applicant.LastName}`}
+            alt={`${applicant.firstName} ${applicant.lastName}`}
             className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextElementSibling.style.display = 'flex';
+            onError={() => {
+              setImageErrors(prev => ({ ...prev, [applicant.uid]: true }));
             }}
           />
-          <div 
-            className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-200"
-            style={{ display: 'none' }}
-          >
-            <FaUser className="w-6 h-6 text-gray-500" />
-          </div>
         </div>
       );
     }
-    
     return (
       <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-200">
         <FaUser className="w-6 h-6 text-gray-500" />
@@ -144,13 +174,21 @@ const ApplicantPage = () => {
   const filteredApplicants = applicants.filter((applicant) => {
     const searchLower = searchQuery.toLowerCase();
     return (
-      applicant.FirstName?.toLowerCase().includes(searchLower) ||
-      applicant.LastName?.toLowerCase().includes(searchLower)
+      applicant.firstName?.toLowerCase().includes(searchLower) ||
+      applicant.lastName?.toLowerCase().includes(searchLower)
     );
   });
+  
+  const indexOfLastApplicant = currentPage * applicantsPerPage;
+  const indexOfFirstApplicant = indexOfLastApplicant - applicantsPerPage;
+  const currentApplicants = filteredApplicants.slice(indexOfFirstApplicant, indexOfLastApplicant);
+  const totalPages = Math.ceil(filteredApplicants.length / applicantsPerPage);
+
   const handleExport = () => {
     importExcel(filteredApplicants, 'Applicants');
   };
+
+  console.log("Render - Total applicants:", applicants.length, "Current page:", currentPage, "Showing:", currentApplicants.length);
 
   return (
     <div className="relative min-h-screen bg-gray-50 overflow-x-hidden">
@@ -166,13 +204,16 @@ const ApplicantPage = () => {
       )}
       <div className="p-6 text-gray-800">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">Applicant</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Applicant ({applicants.length} total)
+          </h2>
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <button className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
+            <button
+              className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
               onClick={handleExport}>
               Export Excel File
             </button>
+            <div className="relative">
               <input
                 type="text"
                 placeholder="Search by Name"
@@ -198,67 +239,71 @@ const ApplicantPage = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Picture
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    ID Number
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    E-Mail
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Phone
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Position
-                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Picture</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID Number</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">E-Mail</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Phone</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Position</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredApplicants.map((applicant, index) => (
-                  <tr 
-                    key={`${applicant.uid}_${index}`} 
-                    className="hover:bg-blue-50 cursor-pointer transition-colors duration-200"
-                    onClick={() => handleSelectApplicant(applicant)}
-                    title={`Click to view ${applicant.FirstName} ${applicant.LastName}'s details`}
-                  >
-                    <td className="px-6 py-4">
-                      {renderAvatar(applicant)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {index + 1}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {applicant.FirstName} {applicant.LastName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{applicant.EmailAddress}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{applicant.ContactNumber}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{applicant.PositionApplied}</div>
-                    </td>
-                  </tr>
-                ))}
-                {filteredApplicants.length === 0 && (
+                {currentApplicants.length > 0 ? (
+                  currentApplicants.map((applicant) => (
+                    <tr 
+                      key={applicant.uid} 
+                      className="hover:bg-gray-100 cursor-pointer transition-colors"
+                      onClick={() => handleSelectApplicant(applicant)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">{renderAvatar(applicant)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{applicant.uid.slice(0, 8)}...</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{applicant.firstName} {applicant.lastName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{applicant.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{applicant.phone}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{applicant.position}</td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
-                    <td colSpan="6" className="px-6 py-8 text-center text-gray-500 italic">
-                      No Applicants Found
-                    </td>
+                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">No applicants found.</td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-6">
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                <button
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                    pageNumber === currentPage
+                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </nav>
           </div>
         )}
       </div>

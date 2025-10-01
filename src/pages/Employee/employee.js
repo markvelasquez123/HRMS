@@ -1,6 +1,7 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import { X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign, Search, Eye, AlertCircle, Carrot } from "lucide-react";
 import ExcelImport from "../../components/Excelimport/importExcel";
+import EditEmployeeModal from "../../components/employee/EditEmployee"; 
 
 
 const initialFormState = {
@@ -39,7 +40,13 @@ const Alert = ({ type, message, onClose }) => (
 const EmployeeSidebar = ({ employee, onClose }) => {
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => { setVisible(true); }, []);
+  // ✅ Local state so updates from modal show instantly
+  const [currentEmployee, setCurrentEmployee] = useState(employee);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  useEffect(() => { 
+    setVisible(true); 
+  }, []);
 
   const handleClose = () => {
     setVisible(false);
@@ -47,8 +54,14 @@ const EmployeeSidebar = ({ employee, onClose }) => {
   };
 
   const getAvatarDisplay = () => {
-    if (employee?.ProfilePicture) {
-      return <img src={`http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}`} alt={`${employee.FirstName} ${employee.LastName}`} className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto" />;
+    if (currentEmployee?.ProfilePicture) {
+      return (
+        <img
+          src={`http://localhost/HRMSbackend/uploads/${currentEmployee.ProfilePicture}`}
+          alt={`${currentEmployee.FirstName} ${currentEmployee.LastName}`}
+          className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto"
+        />
+      );
     }
     return (
       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-4 ring-gray-100 mx-auto">
@@ -57,16 +70,24 @@ const EmployeeSidebar = ({ employee, onClose }) => {
     );
   };
 
-  if (!employee) return null;
+  if (!currentEmployee) return null;
 
   return (
     <div className=" fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
       <div className={`bg-white w-full w-full h-full shadow-2xl transform transition-transform duration-300 ${visible ? "translate-x-0" : "translate-x-full"}`}>
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-900">Details</h2>
-          <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Edit
+            </button>
+            <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
         </div>
 
         <div className="overflow-y-auto h-full pb-20">
@@ -74,32 +95,32 @@ const EmployeeSidebar = ({ employee, onClose }) => {
             <div className="text-center">
               {getAvatarDisplay()}
               <div className="mt-4">
-                <h3 className="text-xl font-semibold text-gray-900">{employee.FirstName} {employee.LastName}</h3>
-                <p className="text-sm text-blue-600 font-medium mt-1">{employee.Position}</p>
-                <p className="text-sm text-gray-500">{employee.Department}</p>
+                <h3 className="text-xl font-semibold text-gray-900">{currentEmployee.FirstName} {currentEmployee.LastName}</h3>
+                <p className="text-sm text-blue-600 font-medium mt-1">{currentEmployee.Position}</p>
+                <p className="text-sm text-gray-500">{currentEmployee.Department}</p>
                 <div className="inline-block px-3 py-1 mt-3 rounded-full border bg-green-50 text-green-700 border-green-200 text-sm font-medium">Active</div>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
-              <div className="flex items-center text-sm"><Mail className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{employee.EmailAddress}</span></div>
-              <div className="flex items-center text-sm"><Phone className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{employee.ContactNumber}</span></div>
+              <div className="flex items-center text-sm"><Mail className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{currentEmployee.EmailAddress}</span></div>
+              <div className="flex items-center text-sm"><Phone className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0" /><span className="text-gray-900">{currentEmployee.ContactNumber}</span></div>
               <div className="flex items-start text-sm">
                 <MapPin className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-900 leading-relaxed">{employee.HomeAddress}</span>
+                <span className="text-gray-900 leading-relaxed">{currentEmployee.HomeAddress}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-blue-50 rounded-lg p-4">
                 <div className="flex items-center mb-2"><Cake className="w-4 h-4 text-blue-600 mr-2" /><span className="text-sm font-medium text-blue-900">Birth Date</span></div>
-                <span className="text-sm text-blue-800">{employee.Birthdate}</span>
+                <span className="text-sm text-blue-800">{currentEmployee.Birthdate}</span>
               </div>
-              {employee.Gender && (
+              {currentEmployee.Gender && (
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="flex items-center mb-2"><User className="w-4 h-4 text-purple-600 mr-2" /><span className="text-sm font-medium text-purple-900">Gender</span></div>
-                  <span className="text-sm text-purple-800">{employee.Gender}</span>
+                  <span className="text-sm text-purple-800">{currentEmployee.Gender}</span>
                 </div>
               )}
             </div>
@@ -108,12 +129,11 @@ const EmployeeSidebar = ({ employee, onClose }) => {
               <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><Briefcase className="w-4 h-4 mr-2" />Employment Information </h4>
               <div className="space-y-3">
                 {[
-                  { icon: IdCard, label: "Employee ID", value: employee.IDNumber },
-                  { icon: Building, label: "Type", value: employee.EmployeeType },
-                  { icon: Carrot, label: "Type", value: employee.Company },
-
-                  { icon: DollarSign, label: "Passport", value: `${employee.Passport}`, className: "text-green-600" },
-                  { icon: Cake, label: "Hire Date", value: employee.DateHired }
+                  { icon: IdCard, label: "Employee ID", value: currentEmployee.IDNumber },
+                  { icon: Building, label: "Type", value: currentEmployee.EmployeeType },
+                  { icon: Briefcase, label: "Company", value: currentEmployee.Company },
+                  { icon: Briefcase, label: "Passport", value: `${currentEmployee.Passport}`, className: "text-green-600" },
+                  { icon: Cake, label: "Hire Date", value: currentEmployee.DateHired }
                 ].map(({ icon: Icon, label, value, className = "text-gray-900" }) => (
                   <div key={label} className="flex items-center justify-between">
                     <div className="flex items-center text-sm"><Icon className="w-4 h-4 text-gray-500 mr-2" /><span className="text-gray-600">{label}</span></div>
@@ -123,11 +143,11 @@ const EmployeeSidebar = ({ employee, onClose }) => {
               </div>
             </div>
 
-            {employee.ResumeFile && (
+            {currentEmployee.ResumeFile && (
               <div>
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><FileText className="w-4 h-4 mr-2" />Documents</h4>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <a href={`http://localhost/HRMSbackend/uploads/${employee.ResumeFile}`} target="_blank" rel="noopener noreferrer"
+                  <a href={`http://localhost/HRMSbackend/uploads/${currentEmployee.ResumeFile}`} target="_blank" rel="noopener noreferrer"
                     className="flex items-center text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
                     <FileText className="w-4 h-4 mr-2 flex-shrink-0" />View Resume
                   </a>
@@ -137,6 +157,17 @@ const EmployeeSidebar = ({ employee, onClose }) => {
           </div>
         </div>
       </div>
+
+      {/* ✅ Edit Employee Modal */}
+      {showEditModal && (
+        <EditEmployeeModal
+          employee={currentEmployee}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={(updatedData) => {
+            setCurrentEmployee((prev) => ({ ...prev, ...updatedData }));
+          }}
+        />
+      )}
     </div>
   );
 };

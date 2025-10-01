@@ -2,21 +2,27 @@ import React from "react";
 
 export default function HRMSBanner() {
   let company = "";
-try {
-  const userData = JSON.parse(sessionStorage.getItem('userData'));
-  company = userData?.company?.toLowerCase() || "";
-} catch (e) {
-  company = "";
-}
-
-const CompanyColor = [
-  {
-    company: "asia navis",
-    color: Color
+  try {
+    const userData = JSON.parse(sessionStorage.getItem('userData'));
+    company = userData?.company?.toLowerCase() || "";
+  } catch (e) {
+    company = "";
   }
-]
+
+  // Define a set of background gradient classes for each company
+  const companyGradients = {
+    "asia navis": "from-blue-600 to-blue-300",
+    "peak hr": "from-orange-500 to-blue-500",
+    "rigel": "from-teal-600 to-cyan-400",
+  };
+
+  // Select the gradient class based on the company name, or fall back to the default
+  const currentGradient = companyGradients[company] || companyGradients["asia navis"];
+
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-300 text-white">
+    // Only the gradient class is dynamic here. All other classes for layout
+    // and size (like px-6 py-12, lg:px-8 lg:py-16, etc.) are untouched.
+    <div className={`relative overflow-hidden bg-gradient-to-r ${currentGradient} text-white`}>
       
       <div className="absolute inset-0 bg-black bg-opacity-10">
         <div className="absolute inset-0" style={{

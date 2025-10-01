@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { X, Check, ChevronDown, FileText, User, Phone, Mail, MapPin, Cake, Briefcase, Building, Calendar, ClipboardList, CheckCircle, XCircle } from "lucide-react";
+import { X, Check, ChevronDown, FileText, User, Phone, Mail, MapPin, Cake, Briefcase, Building, Calendar, ClipboardList, CheckCircle, XCircle, Edit } from "lucide-react";
+import EditApplicantModal from './EditApplicant';
 
 const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange }) => {
   const [visible, setVisible] = useState(false);
@@ -13,8 +14,9 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   const [error, setError] = useState(null);
   const [isEmployee, setIsEmployee] = useState(false);
   const [isOFW, setIsOFW] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   
-  // New interview fields
+  // Interview fields
   const [interviewDate, setInterviewDate] = useState("");
   const [interviewStatus, setInterviewStatus] = useState("");
   const [interviewResult, setInterviewResult] = useState("");
@@ -88,7 +90,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   const handleOFWCheck = () => {
     setIsOFW(true);
     setIsEmployee(false);
-    
     setEmployeeType("");
     setDepartment("");
   };
@@ -183,7 +184,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
           PoliceClearance: applicant.PoliceClearance,
           PagIbig: applicant.PagIbig,
           PhilHealth: applicant.PhilHealth,
-          // Add interview data
           interviewDate,
           interviewStatus,
           interviewResult,
@@ -285,7 +285,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
           HomeAddress: applicant.HomeAddress,
           ProfilePicture: applicant.ProfilePicture,
           Resume: applicant.Resume,
-          // Add interview data
           interviewDate,
           interviewStatus,
           interviewResult,
@@ -348,19 +347,20 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         }
       }
     } catch (error) {
-    console.error("Error accepting applicant:", error);
-    
-    if (error.message.includes('fetch')) {
-      alert('Network error: Could not connect to server. Please check if the backend is running.');
-    } else if (error.message.includes('JSON') || error.message.includes('PHP Error')) {
-      alert('Server error: Your PHP backend is returning errors instead of JSON. Check your server logs for PHP errors.');
-    } else {
-      alert(`Failed to accept applicant: ${error.message}`);
+      console.error("Error accepting applicant:", error);
+      
+      if (error.message.includes('fetch')) {
+        alert('Network error: Could not connect to server. Please check if the backend is running.');
+      } else if (error.message.includes('JSON') || error.message.includes('PHP Error')) {
+        alert('Server error: Your PHP backend is returning errors instead of JSON. Check your server logs for PHP errors.');
+      } else {
+        alert(`Failed to accept applicant: ${error.message}`);
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
   const handleReject = async () => {
     try {
       setLoading(true);
@@ -448,7 +448,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   const contactInfo = [
     { icon: Mail, text: applicant.EmailAddress },
     { icon: Phone, text: applicant.ContactNumber },
-    { icon: MapPin, text: `${applicant.HomeAddress},` }
+    { icon: MapPin, text: applicant.HomeAddress }
   ];
 
   const documents = [
@@ -460,7 +460,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
     { label: "TIN ID", url: applicant.TinID || applicant.tinid },
     { label: "NBI Clearance", url: applicant.NBIClearance || applicant.nbiclearance },
     { label: "Police Clearance", url: applicant.PoliceClearance || applicant.policeclearance },
-    { label: "Pag-IBIG Number", url: applicant.PagIbig || applicant.pagibig},
+    { label: "Pag-IBIG Number", url: applicant.PagIbig || applicant.pagibig },
     { label: "PhilHealth Number", url: applicant.PhilHealth || applicant.philhealth },
   ].filter(({ url }) => url);
 
@@ -500,22 +500,32 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
-      <div className={`bg-white  w-full h-full shadow-2xl transform transition-transform duration-300 ${
+      <div className={`bg-white w-full h-full shadow-2xl transform transition-transform duration-300 ${
         visible ? "translate-x-0" : "translate-x-full"
       }`}>
         
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
           <h2 className="text-xl font-semibold text-gray-900">Details</h2>
-          <button 
-            onClick={handleClose} 
-            disabled={loading}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setShowEditModal(true)}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              <Edit className="w-4 h-4" />
+              <span>Edit</span>
+            </button>
+            <button 
+              onClick={handleClose} 
+              disabled={loading}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
         </div>
 
-        <div className="overflow-y-auto h-full pb-20">
+        <div className="overflow-y-auto h-[calc(100%-80px)]">
           <div className="p-6 space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -563,7 +573,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
                 </span>
               </div>
               
-              {applicant.Genderender && (
+              {applicant.Gender && (
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <User className="w-4 h-4 text-purple-600 mr-2" />
@@ -574,7 +584,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
               )}
             </div>
 
-            {/* Interview Information Section */}
             <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
               <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
                 <ClipboardList className="w-4 h-4 mr-2 text-indigo-600" />
@@ -582,7 +591,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
               </h4>
               
               <div className="space-y-4">
-                {/* Interview Date */}
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
                     <Calendar className="w-4 h-4 mr-2" />
@@ -596,7 +604,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
                   />
                 </div>
 
-                {/* Interview Status */}
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
                     <ClipboardList className="w-4 h-4 mr-2" />
@@ -611,7 +618,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
                   />
                 </div>
 
-                {/* Interview Result */}
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-3 flex items-center">
                     <CheckCircle className="w-4 h-4 mr-2" />
@@ -671,6 +677,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
                 </label>
               </div>
             </div>
+
             {isEmployee && (
               <div className="space-y-4">
                 {renderDropdown("Employee Type", Briefcase, employeeType, employeeTypes, dropdownVisible, setDropdownVisible, setEmployeeType)}
@@ -719,6 +726,15 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
                 <span>{loading ? 'Processing...' : 'Reject'}</span>
               </button>
             </div>
+            {showEditModal && (
+  <EditApplicantModal
+    applicant={applicant}
+    onClose={() => setShowEditModal(false)}
+    onUpdate={(updatedData) => {
+      setApplicant(prev => ({ ...prev, ...updatedData }));
+    }}
+  />
+)}
           </div>
         </div>
       </div>

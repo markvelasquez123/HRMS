@@ -1,28 +1,56 @@
 import React, { useState, useEffect } from "react";
-import { X, Download, FileText, User, Phone, Mail, MapPin, Briefcase, Calendar, CheckCircle, AlertCircle, Clock, Shield } from "lucide-react";
+import { X, Download, FileText, User, Phone, Mail, MapPin, Briefcase, Calendar, CheckCircle, AlertCircle, Clock, Shield, Edit, Cake, Building } from "lucide-react";
+import EditEmployeeModal from './EditEmployee';
+
+const UPDATE_API_URL = "http://localhost/HRMSbackend/update_employee.php";
+const RETIRE_API_URL = "http://localhost/HRMSbackend/retire_employee.php";
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return "N/A";
-  if (timestamp.toDate) return timestamp.toDate().toLocaleDateString();
-  if (timestamp._seconds) return new Date(timestamp._seconds * 1000).toLocaleDateString();
-  return timestamp;
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) {
+    return "Invalid Date";
+  }
+  return date.toLocaleDateString();
 };
 
-const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
+const EmployeeSidebar = ({ employee: initialEmployee, onClose, onEmployeeRemoved, onEmployeeUpdated }) => {
   const [visible, setVisible] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [showResignPrompt, setShowResignPrompt] = useState(false);
   const [resignationDate, setResignationDate] = useState("");
   const [resignationReason, setResignationReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentEmployee, setCurrentEmployee] = useState(initialEmployee);
 
   useEffect(() => {
     setVisible(true);
-  }, []);
+    if (initialEmployee) {
+      setCurrentEmployee(initialEmployee);
+    }
+  }, [initialEmployee]);
 
   const handleClose = () => {
     setVisible(false);
     setTimeout(() => onClose(), 300);
+  };
+
+  const getAvatarDisplay = () => {
+    if (currentEmployee?.ProfilePicture) {
+      return (
+        <img 
+          src={`http://localhost/HRMSbackend/uploads/${currentEmployee.ProfilePicture}`} 
+          alt={`${currentEmployee.FirstName} ${currentEmployee.LastName}`} 
+          className="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-white" 
+        />
+      );
+    }
+    return (
+      <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border-2 border-white shadow-lg">
+        <User size={40} />
+      </div>
+    );
   };
 
   const handleResign = async () => {
@@ -33,142 +61,138 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
 
     setIsSubmitting(true);
     try {
-      
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch(RETIRE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employeeId: currentEmployee.IDNumber,
+          resignationDate,
+          resignationReason,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || `HTTP error! status: ${response.status}`);
+      }
+
       alert("Employee resignation processed successfully");
+      if (onEmployeeRemoved) {
+        onEmployeeRemoved(currentEmployee.IDNumber);
+      }
       handleClose();
     } catch (error) {
       console.error("Error in handleResign:", error);
       alert(`Failed to process resignation: ${error.message}`);
     } finally {
       setIsSubmitting(false);
+      setShowResignPrompt(false);
+    }
+  };
+
+  const handleUpdateEmployee = async (updatedData) => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(UPDATE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || `HTTP error! status: ${response.status}`);
+      }
+
+      setCurrentEmployee(updatedData);
+      if (onEmployeeUpdated) {
+        onEmployeeUpdated(updatedData);
+      }
+      setShowEditModal(false);
+      alert("Employee details updated successfully");
+    } catch (error) {
+      console.error("Error in handleUpdateEmployee:", error);
+      alert(`Failed to update employee details: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const documentsList = [
-    { 
-      label: "Resume", 
-      url: employee?.resumeUrl, 
-      icon: FileText,
-      required: true 
-    },
-    { 
-      label: "Passport", 
-      url: employee?.passport, 
-      icon: Shield,
-      required: false 
-    },
-    { 
-      label: "Diploma", 
-      url: employee?.diploma, 
-      icon: FileText,
-      required: true 
-    },
-    { 
-      label: "TOR", 
-      url: employee?.tor, 
-      icon: FileText,
-      required: true 
-    },
-    { 
-      label: "Medical Certificate", 
-      url: employee?.medical, 
-      icon: FileText,
-      required: true 
-    },
-    { 
-      label: "TIN ID", 
-      url: employee?.tinId, 
-      icon: FileText,
-      required: true 
-    },
-    { 
-      label: "NBI Clearance", 
-      url: employee?.nbiClearance, 
-      icon: Shield,
-      required: true 
-    },
-    { 
-      label: "Police Clearance", 
-      url: employee?.policeClearance, 
-      icon: Shield,
-      required: true 
-    },
-    { 
-      label: "Pag-IBIG", 
-      url: employee?.pagibigNumber, 
-      icon: FileText,
-      required: true 
-    },
-    { 
-      label: "PhilHealth", 
-      url: employee?.philhealthNumber, 
-      icon: FileText,
-      required: true 
-    }
+    { label: "Resume", url: currentEmployee?.ResumeFile, required: true },
+    { label: "Passport", url: currentEmployee?.Passport, required: false },
+    { label: "Diploma", url: currentEmployee?.Diploma, required: true },
+    { label: "TOR", url: currentEmployee?.Tor, required: true },
+    { label: "Medical Certificate", url: currentEmployee?.Medical, required: true },
+    { label: "TIN ID", url: currentEmployee?.TinID, required: true },
+    { label: "NBI Clearance", url: currentEmployee?.NBIClearance, required: true },
+    { label: "Police Clearance", url: currentEmployee?.PoliceClearance, required: true },
+    { label: "Pag-IBIG", url: currentEmployee?.PagIbig, required: true },
+    { label: "PhilHealth", url: currentEmployee?.PhilHealth, required: true }
   ];
 
-  
-  const mockEmployee = employee || {
-    FirstName: "John",
-    LastName: "Doe",
-    PositionApplied: "Software Engineer",
-    status: "Active",
-    IDNumber: "EMP001",
-    ContactNumber: "+63 912 345 6789",
-    EmailAddress: "john.doe@company.com",
-    gender: "Male",
-    street1: "123 Main Street",
-    city: "Manila",
-    state: "NCR",
-    zip: "1000",
-    department: "Information Technology",
-    birthDate: "1990-05-15",
-    dateHired: "2022-01-15",
-    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    resumeUrl: "https://example.com/resume.pdf",
-    diploma: "https://example.com/diploma.pdf",
-    tor: "https://example.com/tor.pdf"
+  const renderDocumentStatus = (doc) => {
+    const isCompleted = !!doc.url;
+    const isRequired = doc.required;
+    
+    if (isCompleted) {
+      return <CheckCircle className="w-5 h-5 text-green-500" />;
+    }
+    if (isRequired) {
+      return <AlertCircle className="w-5 h-5 text-red-500" />;
+    }
+    return <Clock className="w-5 h-5 text-gray-400" />;
   };
 
-  const currentEmployee = mockEmployee;
+  const renderFileLink = (url) => {
+    if (url) {
+      const fullUrl = `http://localhost/HRMSbackend/uploads/${url}`;
+      return (
+        <a 
+          href={fullUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-blue-500 hover:underline flex items-center gap-2"
+        >
+          <FileText size={16} /> View Document
+        </a>
+      );
+    }
+    return <span className="text-gray-500">Not provided</span>;
+  };
 
   const requiredDocs = documentsList.filter(doc => doc.required);
   const completedRequired = requiredDocs.filter(doc => doc.url).length;
-  const completionPercentage = Math.round((completedRequired / requiredDocs.length) * 100);
+  const completionPercentage = requiredDocs.length > 0 ? Math.round((completedRequired / requiredDocs.length) * 100) : 100;
 
   if (!currentEmployee) return null;
 
   return (
-    <div className="fixed inset-0 flex justify-end z-50">
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300" 
-        onClick={handleClose}
-      ></div>
-      <div
-        className={`relative bg-white w-screen h-screen shadow-2xl transform transition-all duration-300 flex flex-col ${
-          visible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-        }`}
-      >
-        
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="relative flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold">Employee Profile</h2>
-              <p className="text-blue-100 text-sm mt-1">Complete employee information</p>
-            </div>
-            <button 
-              onClick={handleClose}
-              className="p-2 rounded-full hover:bg-white/20 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+    <div
+      className={`fixed top-0 right-0 w-full md:w-96 bg-white h-full shadow-lg transform transition-transform duration-300 ease-in-out z-50 overflow-y-auto ${visible ? "translate-x-0" : "translate-x-full"}`}
+    >
+      
+      <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
+        <h2 className="text-xl font-semibold text-gray-900">Employee Profile</h2>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setShowEditModal(true)}
+            disabled={isSubmitting}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Edit</span>
+          </button>
+          <button 
+            onClick={handleClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
         </div>
-
-        
-        <div className="flex border-b bg-gray-50">
+      </div>
+      
+      <div className="flex border-b bg-gray-50">
           <button 
             onClick={() => setActiveTab("details")}
             className={`flex-1 py-4 px-6 font-semibold text-sm transition-all relative ${
@@ -194,254 +218,136 @@ const EmployeeSidebar = ({ employee, onClose, onEmployeeRemoved }) => {
               {completedRequired}/{requiredDocs.length}
             </span>
           </button>
+      </div>
+      
+      <div className="p-6">
+        <div className="flex flex-col items-center mb-6">
+          {getAvatarDisplay()}
+          <h3 className="text-xl font-bold text-gray-900 mt-4">{currentEmployee.FirstName} {currentEmployee.LastName}</h3>
+          <p className="text-sm text-gray-500">{currentEmployee.Position || 'N/A'}</p>
         </div>
-
         
-        <div className="flex-1 overflow-y-auto">
+        <div className="space-y-4 text-gray-700">
           {activeTab === "details" && (
-            <div className="p-6 space-y-8">
-              
-              <div className="relative">
-                <div className="flex items-center space-x-6">
-                  <div className="relative">
-                    <img
-                      src={currentEmployee.photoUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"}
-                      alt={`${currentEmployee.firstName} ${currentEmployee.lastName}`}
-                      className="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow-lg"
-                    />
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                      {currentEmployee.firstName} {currentEmployee.lastName}
-                    </h3>
-                    <p className="text-lg text-gray-600 mb-3">{currentEmployee.position || "No position specified"}</p>
-                    <div className="flex items-center space-x-3">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        {currentEmployee.status || "Active"}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        ID: {currentEmployee.IDNumber || "N/A"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            <>
+              <div className="flex items-center gap-4">
+                <Mail size={20} className="text-gray-500" />
+                <p className="text-sm">Email: <span className="font-medium">{currentEmployee.EmailAddress || 'N/A'}</span></p>
               </div>
-
-              
-              <div className="grid gap-4">
-                
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
-                  <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
-                    <Phone className="w-5 h-5 mr-2 text-blue-600" />
-                    Contact Information
-                  </h4>
-                  <div className="grid gap-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                        <Phone className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Phone Number</p>
-                        <p className="text-gray-800 font-medium">{currentEmployee.phone || "N/A"}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                        <Mail className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">E-Mail</p>
-                        <p className="text-gray-800 font-medium">{currentEmployee.email || "N/A"}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-100">
-                  <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
-                    <User className="w-5 h-5 mr-2 text-purple-600" />
-                    Personal Information
-                  </h4>
-                  <div className="grid gap-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                        <User className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Gender</p>
-                        <p className="text-gray-800 font-medium">{currentEmployee.gender || "N/A"}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                        <Calendar className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Birth Date</p>
-                        <p className="text-gray-800 font-medium">{formatTimestamp(currentEmployee.birthDate)}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                        <MapPin className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Address</p>
-                        <p className="text-gray-800 font-medium">
-                          {[
-                            currentEmployee.HomeAddress
-                          ].filter(Boolean).join(", ") || "N/A"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
-                  <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
-                    <Briefcase className="w-5 h-5 mr-2 text-green-600" />
-                    Work Information
-                  </h4>
-                  <div className="grid gap-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                        <Briefcase className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Department</p>
-                        <p className="text-gray-800 font-medium">{currentEmployee.department || "N/A"}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                        <Calendar className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Date Hired</p>
-                        <p className="text-gray-800 font-medium">{formatTimestamp(currentEmployee.dateHired)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div className="flex items-center gap-4">
+                <Phone size={20} className="text-gray-500" />
+                <p className="text-sm">Contact: <span className="font-medium">{currentEmployee.ContactNumber || 'N/A'}</span></p>
               </div>
-            </div>
+              <div className="flex items-center gap-4">
+                <MapPin size={20} className="text-gray-500" />
+                <p className="text-sm">Address: <span className="font-medium">{currentEmployee.HomeAddress || 'N/A'}</span></p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Cake size={20} className="text-gray-500" />
+                <p className="text-sm">Date of Birth: <span className="font-medium">{formatTimestamp(currentEmployee.Birthdate) || 'N/A'}</span></p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Briefcase size={20} className="text-gray-500" />
+                <p className="text-sm">Position: <span className="font-medium">{currentEmployee.Position || 'N/A'}</span></p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Building size={20} className="text-gray-500" />
+                <p className="text-sm">Department: <span className="font-medium">{currentEmployee.Department || 'N/A'}</span></p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Calendar size={20} className="text-gray-500" />
+                <p className="text-sm">Hired: <span className="font-medium">{formatTimestamp(currentEmployee.DateHired) || 'N/A'}</span></p>
+              </div>
+            </>
           )}
 
           {activeTab === "documents" && (
-            <div className="p-6 space-y-6">
-              
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-800">Document Completion</h3>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-blue-600">{completionPercentage}%</div>
-                    <div className="text-sm text-gray-600">Complete</div>
-                  </div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${completionPercentage}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>{completedRequired} of {requiredDocs.length} required documents</span>
-                  <span>{documentsList.filter(doc => !doc.required && doc.url).length} optional documents</span>
-                </div>
-              </div>
-
-              
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-800 flex items-center">
-                  <FileText className="w-5 h-5 mr-2" />
-                  All Documents
-                </h4>
+            <div className="p-6">
+              <h4 className="text-xl font-bold text-gray-900 mb-6">Documents</h4>
+              <ul className="space-y-4">
                 {documentsList.map((doc, index) => (
-                  <div
-                    key={index}
-                    className={`group flex items-center justify-between p-4 bg-white border-2 rounded-xl transition-all hover:shadow-md ${
-                      doc.url 
-                        ? 'border-green-200 hover:border-green-300 bg-green-50/30' 
-                        : doc.required 
-                          ? 'border-red-200 hover:border-red-300 bg-red-50/30'
-                          : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
+                  <li key={index} className="flex items-center justify-between bg-gray-100 rounded-xl p-4 shadow-sm">
                     <div className="flex items-center space-x-4">
-                      <div className={`p-3 rounded-xl ${
-                        doc.url 
-                          ? 'bg-green-100' 
-                          : doc.required 
-                            ? 'bg-red-100' 
-                            : 'bg-gray-100'
-                      }`}>
-                        <doc.icon className={`w-6 h-6 ${
-                          doc.url 
-                            ? 'text-green-600' 
-                            : doc.required 
-                              ? 'text-red-600' 
-                              : 'text-gray-600'
-                        }`} />
-                      </div>
+                      {renderDocumentStatus(doc)}
                       <div>
-                        <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-gray-800">
-                            {doc.label}
-                          </span>
-                          {doc.required && (
-                            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
-                              Required
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center mt-1">
-                          {doc.url ? (
-                            <div className="flex items-center text-green-600 text-sm">
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Available
-                            </div>
-                          ) : doc.required ? (
-                            <div className="flex items-center text-red-600 text-sm">
-                              <AlertCircle className="w-4 h-4 mr-1" />
-                              Missing
-                            </div>
-                          ) : (
-                            <div className="flex items-center text-gray-500 text-sm">
-                              <Clock className="w-4 h-4 mr-1" />
-                              Optional
-                            </div>
-                          )}
-                        </div>
+                        <p className="text-sm font-medium text-gray-900">{doc.label}</p>
+                        {doc.required && !doc.url && (
+                          <span className="text-xs text-red-500 font-medium">Required</span>
+                        )}
                       </div>
                     </div>
-                    {doc.url ? (
-                      <a
-                        href={doc.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors group-hover:shadow-md"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span className="text-sm font-medium">Download</span>
-                      </a>
-                    ) : (
-                      <span className="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm">
-                        Not provided
-                      </span>
-                    )}
-                  </div>
+                    {renderFileLink(doc.url)}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
         </div>
+
+        <div className="mt-8 pt-6 border-t border-gray-200 p-6">
+            {!showResignPrompt && (
+              <button
+                onClick={() => setShowResignPrompt(true)}
+                className="w-full flex items-center justify-center py-3 px-6 border border-red-500 text-red-500 rounded-full font-semibold transition-colors duration-200 hover:bg-red-50"
+              >
+                <AlertCircle className="w-5 h-5 mr-2" />
+                Process Resignation
+              </button>
+            )}
+
+            {showResignPrompt && (
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <h4 className="font-semibold text-gray-800 mb-4">Resignation Details</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Resignation Date</label>
+                    <input
+                      type="date"
+                      value={resignationDate}
+                      onChange={(e) => setResignationDate(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                    <textarea
+                      value={resignationReason}
+                      onChange={(e) => setResignationReason(e.target.value)}
+                      rows="3"
+                      className="w-full p-2 border border-gray-300 rounded-md text-sm resize-none"
+                      placeholder="Enter reason for resignation..."
+                    ></textarea>
+                  </div>
+                </div>
+                <div className="mt-4 flex space-x-4">
+                  <button
+                    onClick={handleResign}
+                    className={`flex-1 py-2 px-4 rounded-md text-white font-medium transition-colors duration-200 ${
+                      isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                    }`}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Processing..." : "Confirm Resignation"}
+                  </button>
+                  <button
+                    onClick={() => setShowResignPrompt(false)}
+                    className="flex-1 py-2 px-4 rounded-md border border-gray-300 text-gray-700 font-medium transition-colors duration-200 hover:bg-gray-100"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+        </div>
       </div>
+      {showEditModal && (
+        <EditEmployeeModal
+          employee={currentEmployee}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleUpdateEmployee}
+        />
+      )}
     </div>
   );
 };
