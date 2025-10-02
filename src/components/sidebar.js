@@ -55,6 +55,7 @@ const Header = ({isHeaderOpen }) => {
       } flex flex-col items-center duration-300 w-16 h-screen bg-white shadow-lg`}
     >
       
+   
       <div className="my-1 flex items-center justify-center w-full">
         <img
           src={activeLogo.subLogo}

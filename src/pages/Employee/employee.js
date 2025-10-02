@@ -6,7 +6,7 @@ import ExcelImport from "../../components/Excelimport/importExcel";
 const initialFormState = {
   IDNumber: "", FirstName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
   ProfilePicture: null, ResumeFile: null, EmailAddress: "", ContactNumber: "", Gender: "", EmployeeType: "", Company: "",
-  HomeAddress: "", Salary: ""
+  HomeAddress: "", Passport: ""
 };
 
 function formReducer(state, action) {
@@ -105,14 +105,14 @@ const EmployeeSidebar = ({ employee, onClose }) => {
             </div>
 
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-              <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><Briefcase className="w-4 h-4 mr-2" />Employment Information</h4>
+              <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><Briefcase className="w-4 h-4 mr-2" />Employment Information </h4>
               <div className="space-y-3">
                 {[
                   { icon: IdCard, label: "Employee ID", value: employee.IDNumber },
                   { icon: Building, label: "Type", value: employee.EmployeeType },
                   { icon: Carrot, label: "Type", value: employee.Company },
 
-                  { icon: DollarSign, label: "Salary", value: `₱${employee.salary}`, className: "text-green-600" },
+                  { icon: DollarSign, label: "Passport", value: `${employee.Passport}`, className: "text-green-600" },
                   { icon: Cake, label: "Hire Date", value: employee.DateHired }
                 ].map(({ icon: Icon, label, value, className = "text-gray-900" }) => (
                   <div key={label} className="flex items-center justify-between">
@@ -145,6 +145,7 @@ const EmployeePage = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("");
   const [employeeList, setEmployeeList] = useState([]);
   const [formData, dispatch] = useReducer(formReducer, initialFormState);
   const [loading, setLoading] = useState(false);
@@ -153,14 +154,15 @@ const EmployeePage = () => {
   const [success, setSuccess] = useState(null);
   const profilePicRef = useRef(null);
   const resumeFileRef = useRef(null);
-  const [fieldErrors, setFieldErrors] = useState({ IDNumber: "", firstName: "", lastName: "", Position: "", phone: "", salary: "" });
+  const [fieldErrors, setFieldErrors] = useState({ IDNumber: "", firstName: "", lastName: "", Position: "", phone: "", Passport: "" });
   const [accID, setaccID] = useState();
   const [isChecked, setIsChecked] = useState(false);
 
-  const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering"];
-  const basicFields = ["IDNumber", "FirstName", "LastName", "BirthDate", "PositionApplied", "Department", "DateHired", "gender", "EmployeeType", "Company", "salary"];
+  const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering", "Architect", "Operation", "Director"];
+  const basicFields = ["IDNumber", "FirstName", "LastName", "BirthDate", "PositionApplied", "Department", "DateHired", "gender", "EmployeeType", "Company", "Passport"];
   const contactFields = ["EmailAddress", "ContactNumber"];
   const addressFields = ["HomeAddress"];
+  const companysort = ["ASIANAVIS" , "RIGEL", "PEAKHR"];
 
 
 
@@ -219,7 +221,7 @@ const EmployeePage = () => {
     
     if ((name === "IDNumber" || name === "ContactNumber") && !isOnlyNumbers(value)) error = "Only numbers are allowed.";
     if ((name === "FirstName" || name === "LastName" || name === "PositionApplied") && !isOnlyLetters(value)) error = "Only letters are allowed.";
-    if (name === "salary" && value && !isValidDecimal(value)) error = "Only numbers and decimal points are allowed.";
+    if (name === "Passport" && value && !isOnlyLetters(value)) error = "Only letters are allowed.";
     
     setFieldErrors(la => ({ ...la, [name]: error }));
     if (!error) dispatch({ type: "UPDATE_FIELD", field: name, value });
@@ -255,8 +257,7 @@ const EmployeePage = () => {
   };
 
   const isFormValid = () => {
-  const requiredFields = ["IDNumber", "FirstName", "LastName", "BirthDate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "gender", "EmployeeType", "company", "HomeAdress", "salary"];
-    
+  const requiredFields = ["IDNumber", "FirstName", "LastName", "BirthDate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "gender", "EmployeeType", "company", "HomeAdress", "Passport"];
     const textAndDateValid = requiredFields.every((field) => {
       if (field === "BirthDate" || field === "DateHired") {
         const dateValue = formData[field];
@@ -264,7 +265,7 @@ const EmployeePage = () => {
       }
       if (field === "IDNumber" && !isOnlyNumbers(formData[field])) return false;
       if (field === "ContactNumber" && !isOnlyNumbers(formData[field])) return false;
-      if (field === "salary" && (!formData[field] || !isValidDecimal(formData[field]))) return false;
+      if (field === "Passport" && (!formData[field] || !isValidDecimal(formData[field]))) return false;
       if ((field === "FirstName" || field === "LastName" || field === "PositionApplied") && !isOnlyLetters(formData[field])) return false;
       if (field === "company" && (!formData.company || formData.company === "")) return false;
       return formData[field] && formData[field].toString().trim() !== "";
@@ -276,7 +277,7 @@ const EmployeePage = () => {
   const resetForm = () => {
     setShowForm(false);
     dispatch({ type: "RESET" });
-    setFieldErrors({ IDNumber: "", FirstName: "", LastName: "", PositionApplied: "", ContactNumber: "", salary: "" });
+    setFieldErrors({ IDNumber: "", FirstName: "", LastName: "", PositionApplied: "", ContactNumber: "", Passport: "" });
     if (profilePicRef.current) profilePicRef.current.value = "";
     if (resumeFileRef.current) resumeFileRef.current.value = "";
     setError(null);
@@ -367,7 +368,8 @@ const EmployeePage = () => {
     return (
       (employee.FirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         employee.LastName?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (selectedDepartment === "" || employee.Department === selectedDepartment)
+      (selectedDepartment === "" || employee.Department === selectedDepartment) &&
+      (selectedCompany === "" || employee.Company === selectedCompany)
     );
 
   });
@@ -376,7 +378,7 @@ const EmployeePage = () => {
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
       IDNumber: "Employee ID", FirstName: "First Name", LastName: "Last Name", DateHired: "Hire Date",
-      Birthdate: "Birth Date", EmployeeType: "Employee Type", company: "Company", PositionApplied: "Position", Department: "Department", salary: "Salary",
+      Birthdate: "Birth Date", EmployeeType: "Employee Type", company: "Company", PositionApplied: "Position", Department: "Department", Passport: "Passport",
       accid: "Account ID",
     };
     const label = labelMap[field] || field.replace(/([A-Z])/g, " $1").trim();
@@ -388,6 +390,7 @@ const EmployeePage = () => {
       className: "w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
       required: isRequired
     };
+    
 
     if (field === "Department") {
       return (
@@ -412,7 +415,7 @@ const EmployeePage = () => {
         </div>
       );
     }
-    if (field === "company") {
+    if (field === "Company") {
       return (
         <div key={field} className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Company *</label>
@@ -453,10 +456,8 @@ const EmployeePage = () => {
         </label>
         <input
           {...commonProps}
-          type={field.includes("Date") ? "date" : field === "email" ? "email" : field === "phone" ? "tel" : field === "salary" ? "number" : "text"}
-          step={field === "salary" ? "0.01" : undefined}
-          min={field === "salary" ? "0" : undefined}
-          inputMode={(field === "IDNumber" || field === "ContactNumber") ? "numeric" : field === "salary" ? "decimal" : undefined}
+          type={field.includes("Date") ? "date" : field === "email" ? "email" : field === "phone" ? "tel" : field === "Passport" ? "number" : "text"}
+          inputMode={(field === "IDNumber" || field === "ContactNumber") ? "numeric" : field === "Passport" ? "decimal" : undefined}
           pattern={(field === "IDNumber" || field === "ContactNumber") ? "[0-9]*" : undefined}
         />
         {fieldErrors[field] && <span className="text-red-500 text-xs">{fieldErrors[field]}</span>}
@@ -469,18 +470,18 @@ const EmployeePage = () => {
   
 
   };
-    const handleExport = () => {
+     const handleExport = () => {
       let datatoexport;
-      if (selectedDepartment) {
-        datatoexport = employeeList.filter(
-          (employee) => employee.Department === selectedDepartment
-        );
-      }else {
-        datatoexport = employeeList;
-      }
+       if (selectedDepartment && selectedCompany) {
+         datatoexport = employeeList.filter(
+           (employee) => employee.Department === selectedDepartment
+         );
+       }else {
+         datatoexport = employeeList;
+       }
 
-      ExcelImport( datatoexport, "Employee List" + (selectedDepartment ? ` - ${selectedDepartment}` : ''));
-    };
+       ExcelImport( datatoexport, "Employee List" + (selectedDepartment ? ` - ${selectedDepartment}` : ''));
+     };
 
     
   return (
@@ -500,6 +501,12 @@ const EmployeePage = () => {
               <option value="">Departments</option>
               {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
             </select>
+            <select className="border border-gray-300 p-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-200"
+              value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)}>
+              <option value="">Company</option>
+              {companysort.map(comp => <option key={comp} value={comp}>{comp}</option>)}
+            </select>
+
             <button className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
               onClick={handleExport}>
               Export Excel File
@@ -609,7 +616,7 @@ const EmployeePage = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {["Picture", "Employee ID", "Name", "Department", "Employee Type", "Gender", "Position", "Salary","Date Hired"].map(header => (
+                {["Picture", "Employee ID", "Name", "Department", "Employee Type", "Company", "Position", "Passport","Date Hired"].map(header => (
                   <th key={header} className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">
                     {header}
                   </th>
@@ -634,9 +641,9 @@ const EmployeePage = () => {
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Department}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.EmployeeType}</div></td>
 
-                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Gender}</div></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Company}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.PositionApplied}</div></td>
-                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">₱{employee.salary}</div></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.Passport}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-600">{employee.DateHired}</div></td>
                 </tr>
               ))}

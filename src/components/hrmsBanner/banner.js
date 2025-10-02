@@ -1,6 +1,20 @@
 import React from "react";
 
 export default function HRMSBanner() {
+  let company = "";
+try {
+  const userData = JSON.parse(sessionStorage.getItem('userData'));
+  company = userData?.company?.toLowerCase() || "";
+} catch (e) {
+  company = "";
+}
+
+const CompanyColor = [
+  {
+    company: "asia navis",
+    color: Color
+  }
+]
   return (
     <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-300 text-white">
       

@@ -452,16 +452,16 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   ];
 
   const documents = [
-    { label: "Resume", url: applicant.Resume },
-    { label: "Passport", url: applicant.Passport },
-    { label: "Diploma", url: applicant.Diploma },
-    { label: "TOR", url: applicant.Tor },
-    { label: "Medical Certificate", url: applicant.Medical },
-    { label: "TIN ID", url: applicant.TinID },
-    { label: "NBI Clearance", url: applicant.NBIClearance },
-    { label: "Police Clearance", url: applicant.PoliceClearance },
-    { label: "Pag-IBIG Number", url: applicant.PagIbig },
-    { label: "PhilHealth Number", url: applicant.PhilHealth },
+    { label: "Resume", url: applicant.Resume || applicant.resume },
+    { label: "Passport", url: applicant.Passport || applicant.passport },
+    { label: "Diploma", url: applicant.Diploma || applicant.diploma },
+    { label: "TOR", url: applicant.Tor || applicant.tor },
+    { label: "Medical Certificate", url: applicant.Medical || applicant.medical },
+    { label: "TIN ID", url: applicant.TinID || applicant.tinid },
+    { label: "NBI Clearance", url: applicant.NBIClearance || applicant.nbiclearance },
+    { label: "Police Clearance", url: applicant.PoliceClearance || applicant.policeclearance },
+    { label: "Pag-IBIG Number", url: applicant.PagIbig || applicant.pagibig},
+    { label: "PhilHealth Number", url: applicant.PhilHealth || applicant.philhealth },
   ].filter(({ url }) => url);
 
   const renderDropdown = (label, icon, value, options, isVisible, setVisible, setValue) => (
