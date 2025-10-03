@@ -273,7 +273,7 @@ const ApplicantPage = () => {
           </div>
         )}
 
-        {totalPages > 1 && (
+         {totalPages > 1 && (
           <div className="flex justify-center mt-6">
             <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
               <button
@@ -283,19 +283,35 @@ const ApplicantPage = () => {
               >
                 Previous
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
-                <button
-                  key={pageNumber}
-                  onClick={() => setCurrentPage(pageNumber)}
-                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                    pageNumber === currentPage
-                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  {pageNumber}
-                </button>
-              ))}
+              {(() => {
+                const maxVisiblePages = 5;
+                const halfVisible = Math.floor(maxVisiblePages / 2);
+                let startPage = Math.max(currentPage - halfVisible, 1);
+                let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+                
+                if (endPage - startPage < maxVisiblePages - 1) {
+                  startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+                }
+                
+                const pages = [];
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(i);
+                }
+                
+                return pages.map(pageNumber => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => setCurrentPage(pageNumber)}
+                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                      pageNumber === currentPage
+                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                ));
+              })()}
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}

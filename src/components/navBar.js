@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, IdCard, DollarSign } from "lucide-react";
-import Logo from "../assets/Mainlogo.png";
+import Logo1 from "../assets/Mainlogo.png";
+import Logo3 from "../assets/Peaklogo.png";
+import Logo2 from "../assets/Rigellogo.png";
 import { Link } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {
@@ -10,63 +12,106 @@ const Navbar = ({ toggleSidebar }) => {
   const [formData, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [company, setCompany] = useState("");
 
-  
   useEffect(() => {
     fetchUser();
-
   }, []);
 
+  useEffect(() => {
+    const updateCompany = () => {
+      try {
+        const userData = JSON.parse(sessionStorage.getItem("userData"));
+        const newCompany = userData?.company?.toLowerCase() || "";
+        setCompany(newCompany);
+      } catch (e) {
+        setCompany("");
+      }
+    };
 
+    //initial load
+    updateCompany();
+
+    // every 1ms ang basa sa sessionStorage
+    const pollInterval = setInterval(() => {
+      updateCompany();
+    }, 1);
+
+    
+    const handleCompanyChange = () => {
+      updateCompany();
+    };
+
+    window.addEventListener('companyChanged', handleCompanyChange);
+    window.addEventListener('storage', handleCompanyChange);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('companyChanged', handleCompanyChange);
+      window.removeEventListener('storage', handleCompanyChange);
+    };
+  }, []);
+
+  const CompanyLogo = [
+    {
+      company: "asia navis",
+      Logo: Logo1,
+    },
+    {
+      company: "rigel",
+      Logo: Logo2,
+    },
+    {
+      company: "peak hr",
+      Logo: Logo3,
+    }
+  ];
+  
+  const activeLogo = 
+    CompanyLogo.find((item) => item.company === company) || CompanyLogo[0];
 
   const fetchUser = async () => {
-  const email = sessionStorage.getItem('userEmail');
+    const email = sessionStorage.getItem('userEmail');
 
-  if (!email) {
-    console.error("No user email found in sessionStorage.");
-    return;
-  }
-
-  try {
-    const response = await fetch("http://localhost/HRMSbackend/employee.php?action=get", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email}),
-      credentials: "include"
-    });
-
-    const data = await response.json();
-
-    if (data && !data.error && data.length > 0) {
-      const user = data[0]; 
-      setUserData(user);
-      sessionStorage.setItem('userData', JSON.stringify(user)); 
-      sessionStorage.setItem('AccID', JSON.stringify(user.accid));
-
-      if (user.ProfilePicture) {
-        setProfilePic(`http://localhost/HRMSbackend/uploads/${user.ProfilePicture}`);
-      }
-    } else {
-      setUserData({});
-      console.warn("No user data found for email:", email);
+    if (!email) {
+      console.error("No user email found in sessionStorage.");
+      return;
     }
-  } catch (error) {
-    setUserData({});
-    console.error('Fetch error:', error);
-  }
-};
 
+    try {
+      const response = await fetch("http://localhost/HRMSbackend/employee.php?action=get", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email}),
+        credentials: "include"
+      });
 
+      const data = await response.json();
 
+      if (data && !data.error && data.length > 0) {
+        const user = data[0]; 
+        setUserData(user);
+        sessionStorage.setItem('userData', JSON.stringify(user)); 
+        sessionStorage.setItem('AccID', JSON.stringify(user.accid));
 
-   const handleAvatarClick = async () => {
+        if (user.ProfilePicture) {
+          setProfilePic(`http://localhost/HRMSbackend/uploads/${user.ProfilePicture}`);
+        }
+      } else {
+        setUserData({});
+        console.warn("No user data found for email:", email);
+      }
+    } catch (error) {
+      setUserData({});
+      console.error('Fetch error:', error);
+    }
+  };
+
+  const handleAvatarClick = () => {
     setShowModal(true);
-   }
-
-
-  
+  }
 
   const handleClose = () => {
     setShowModal(false);
@@ -91,15 +136,13 @@ const Navbar = ({ toggleSidebar }) => {
             
           </button>
           <header className="bg-white">
-                  <div className="max-w-7xl mx-auto py-4 px-6">
-                    <Link to="/Homepage">
-                    <img src={Logo} alt="Logo" className="h-12 " />
-                    </Link>
-                  </div>
-                </header>
-          
-           
-          
+            <div className="max-w-7xl mx-auto py-4 px-6">
+              <Link to="/Homepage">
+                <img src={activeLogo.Logo} 
+                alt="Logo" className="h-12 " />
+              </Link>
+            </div>
+          </header>
           
           <button
             type="button"

@@ -25,13 +25,12 @@ export default function ApplicantCharts() {
   const [error, setError] = useState("");
   const [removedEmployees, setRemovedEmployees] = useState([]);
 
-  // Color palettes for pie charts
   const poolColors = ['#2196F3', '#4CAF50', '#F44336', '#9C27B0'];
   const employeeColors = ['#FF9800', '#2196F3', '#4CAF50'];
  
   const fetchEmployeesFromBackend = async () => {
     try {
-      const response = await fetch('http://localhost/HRMSbackend/employee.php?action=get');
+      const response = await fetch('http://localhost/HRMSbackend/test2.php?action=get');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -45,76 +44,11 @@ export default function ApplicantCharts() {
       }
       
       const employees = await response.json();
+      console.log("Fetched employees from backend:", employees);
       return employees;
     } catch (error) {
       console.error("Error fetching employees from backend:", error);
-      
-      return [
-        { 
-          id: 1, 
-          employeeType: 'Regular', 
-          Department: 'IT', 
-          hireDate: '2025-01-15',
-          FirstName: 'John',
-          LastName: 'Doe'
-        },
-        { 
-          id: 2, 
-          employeeType: 'Project-Based', 
-          Department: 'Engineering', 
-          hireDate: '2025-02-20',
-          FirstName: 'Jane',
-          LastName: 'Smith'
-        },
-        { 
-          id: 3, 
-          employeeType: 'Probationary', 
-          Department: 'HR', 
-          hireDate: '2025-04-10',
-          FirstName: 'Bob',
-          LastName: 'Johnson'
-        },
-        { 
-          id: 4, 
-          employeeType: 'Regular', 
-          Department: 'Marketing', 
-          hireDate: '2025-03-05',
-          FirstName: 'Alice',
-          LastName: 'Brown'
-        },
-        { 
-          id: 5, 
-          employeeType: 'Project-Based', 
-          Department: 'Accounting', 
-          hireDate: '2025-05-12',
-          FirstName: 'Charlie',
-          LastName: 'Wilson'
-        },
-        { 
-          id: 6, 
-          employeeType: 'Probationary', 
-          Department: 'Technical', 
-          hireDate: '2025-07-08',
-          FirstName: 'Diana',
-          LastName: 'Davis'
-        },
-        { 
-          id: 7, 
-          employeeType: 'Regular', 
-          Department: 'IT', 
-          hireDate: '2025-06-15',
-          FirstName: 'Eve',
-          LastName: 'Miller'
-        },
-        { 
-          id: 8, 
-          employeeType: 'Regular', 
-          Department: 'Engineering', 
-          hireDate: '2025-08-20',
-          FirstName: 'Frank',
-          LastName: 'Garcia'
-        }
-      ];
+      return [];
     }
   };
 
@@ -155,15 +89,7 @@ export default function ApplicantCharts() {
     } catch (error) {
       console.error("Error fetching pool data:", error);
       setError(error.message || "Failed to fetch pool data");
-      
-      const mockPoolData = [
-        { uid: '1', status: 'Accepted', department: 'IT', resignedAt: null },
-        { uid: '2', status: 'Rejected', department: 'HR', resignedAt: null },
-        { uid: '3', status: 'Resigned', department: 'Engineering', resignedAt: '2025-02-15' },
-        { uid: '4', status: 'Accepted', department: 'Marketing', resignedAt: null },
-        { uid: '5', status: 'Resigned', department: 'IT', resignedAt: '2025-04-20' },
-      ];
-      setPoolData(mockPoolData);
+      setPoolData([]);
     } finally {
       setLoading(false);
     }
@@ -199,8 +125,8 @@ export default function ApplicantCharts() {
     const qStart = quarter * 3 - 3;
     const qEnd = quarter * 3 - 1;
     return employees.filter(employee => {
-      if (!employee.hireDate) return false;
-      const hireDate = new Date(employee.hireDate);
+      if (!employee.DateHired && !employee.hireDate) return false;
+      const hireDate = new Date(employee.DateHired || employee.hireDate);
       return hireDate.getFullYear() === year && 
              hireDate.getMonth() >= qStart && 
              hireDate.getMonth() <= qEnd;
@@ -221,7 +147,6 @@ export default function ApplicantCharts() {
 
   const fetchEmployees = async () => {
     try {
-      
       const backendEmployees = await fetchEmployeesFromBackend();
       
       const activeEmployees = backendEmployees.filter(employee => 
@@ -229,8 +154,8 @@ export default function ApplicantCharts() {
       );
       
       setEmployeeList(activeEmployees);
+      console.log("Active employees:", activeEmployees);
 
-      
       const q1List = countQuarterlyData(activeEmployees, 2025, 1);
       const q2List = countQuarterlyData(activeEmployees, 2025, 2);
       const q3List = countQuarterlyData(activeEmployees, 2025, 3);
@@ -241,13 +166,11 @@ export default function ApplicantCharts() {
       setQ3Hires(q3List.length);
       setQ4Hires(q4List.length);
 
-      
       setQ1Resigned(countResignedQuarterly(1).length);
       setQ2Resigned(countResignedQuarterly(2).length);
       setQ3Resigned(countResignedQuarterly(3).length);
       setQ4Resigned(countResignedQuarterly(4).length);
 
-     
       const employeeTypeCounts = {
         Regular: 0,
         'Project-Based': 0,
@@ -255,7 +178,7 @@ export default function ApplicantCharts() {
       };
 
       activeEmployees.forEach(employee => {
-        const type = employee.employeeType;
+        const type = employee.EmployeeType || employee.employeeType;
         if (type === 'Regular') {
           employeeTypeCounts.Regular++;
         } else if (type === 'Project-Based' || type === 'Project Based') {
@@ -265,17 +188,17 @@ export default function ApplicantCharts() {
         }
       });
 
-      
+      console.log("Employee type counts:", employeeTypeCounts);
+
       setemployeeData([
         { name: "Regular", count: employeeTypeCounts.Regular },
         { name: "Project Based", count: employeeTypeCounts['Project-Based'] },
         { name: "Probationary", count: employeeTypeCounts.Probationary }
       ]);
 
-      
       const departmentCount = {
         PMS: 0, Accounting: 0, Technical: 0, Admin: 0, Utility: 0,
-        HR: 0, IT: 0, Marketing: 0, Engineering: 0
+        HR: 0, IT: 0, Marketing: 0, Engineering: 0, Architect: 0, Operation: 0, Director: 0
       };
 
       activeEmployees.forEach(employee => {
@@ -287,7 +210,6 @@ export default function ApplicantCharts() {
 
       setDepartmentData(Object.entries(departmentCount).map(([name, count]) => ({ name, count })));
 
-      
       if (selectedYear === 2025) {
         const monthlyRetention = [1, 2, 3, 4].map(q => {
           const hires = q === 1 ? q1List.length : q === 2 ? q2List.length : q === 3 ? q3List.length : q4List.length;
@@ -301,8 +223,6 @@ export default function ApplicantCharts() {
         });
         setMonthlyData(monthlyRetention);
       }
-
-      console.log("Active Employees:", activeEmployees.length);
 
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -323,7 +243,6 @@ export default function ApplicantCharts() {
 
     fetchData();
 
-    
     const interval = setInterval(() => {
       fetchEmployees();
       if (new Date().getFullYear() >= 2026) {
@@ -386,22 +305,6 @@ export default function ApplicantCharts() {
     }
   };
 
-  const addToPool = (employee) => setPoolData(prev => [...prev, employee]);
-  const removeEmployee = (uid) => setRemovedEmployees(prev => [...prev, uid]);
-  const updateEmployeeStatus = (uid, status, resignedAt = null) => {
-    setPoolData(prev => prev.map(emp => 
-      emp.uid === uid ? { ...emp, status, resignedAt } : emp
-    ));
-  };
-
-  const chartStyle = {
-    backgroundColor: 'white',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-  };
-
-  // Custom label function for pie charts
   const renderLabel = (entry) => {
     if (entry.value === 0) return '';
     return `${entry.name}: ${entry.value}`;
@@ -424,7 +327,6 @@ export default function ApplicantCharts() {
         <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-yellow-800 font-medium">API Connection Issue</p>
           <p className="text-yellow-700 text-sm">{error}</p>
-          <p className="text-yellow-700 text-sm">Using fallback mock data for demonstration.</p>
         </div>
       )}
 
@@ -453,7 +355,7 @@ export default function ApplicantCharts() {
                     <Cell key={`cell-${index}`} fill={poolColors[index % poolColors.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={chartStyle} />
+                <Tooltip />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -463,6 +365,9 @@ export default function ApplicantCharts() {
         <div className="w-1/2 p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
           <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
             Employee Statistics
+            <span className="text-sm font-normal text-gray-500 ml-2">
+              (Total: {employeeList.length} employees)
+            </span>
           </h2>
           <div className="w-full h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -481,7 +386,7 @@ export default function ApplicantCharts() {
                     <Cell key={`cell-${index}`} fill={employeeColors[index % employeeColors.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={chartStyle} />
+                <Tooltip />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -497,7 +402,7 @@ export default function ApplicantCharts() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} stroke="#666" tick={{ fontSize: 12 }} />
               <YAxis allowDecimals={false} stroke="#666" />
-              <Tooltip contentStyle={chartStyle} />
+              <Tooltip />
               <Legend />
               <Bar dataKey="count" fill="#9C27B0" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -515,7 +420,6 @@ export default function ApplicantCharts() {
               <YAxis yAxisId="left" orientation="left" stroke="#666" label={{ value: 'Rate (%)', angle: -90, position: 'insideLeft' }} />
               <YAxis yAxisId="right" orientation="right" stroke="#666" label={{ value: 'Number of Employees', angle: 90, position: 'insideRight' }} />
               <Tooltip 
-                contentStyle={chartStyle}
                 formatter={(value, name) => {
                   if (name === "rate") return [value, "S"];
                   if (name === "turnover") return [value, "R"];
@@ -544,7 +448,6 @@ export default function ApplicantCharts() {
                 <YAxis yAxisId="left" orientation="left" stroke="#666" label={{ value: 'Rate (%)', angle: -90, position: 'insideLeft' }} />
                 <YAxis yAxisId="right" orientation="right" stroke="#666" label={{ value: 'Number of Employees', angle: 90, position: 'insideRight' }} />
                 <Tooltip 
-                  contentStyle={chartStyle}
                   formatter={(value, name) => {
                     if (name === "rate") return [value, "S"];
                     if (name === "turnover") return [value, "R"];

@@ -89,6 +89,7 @@ const LoginPage = () => {
           setIsSignUp(false); 
         } else {
           sessionStorage.setItem('userEmail', email);
+          window.dispatchEvent(new Event('companyChanged'));
           const v = sessionStorage.getItem('userEmail');
           
           navigate("/Homepage");

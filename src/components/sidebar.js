@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "./sidebar.css";
 import SubLogo from "../assets/icon-asn.png";
 import SubLogoRigel from "../assets/icon-rigel.png";
@@ -9,6 +10,41 @@ import { signOut } from "firebase/auth";
 const Header = ({isHeaderOpen }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [company, setCompany] = useState("");
+
+  useEffect(() => {
+    const updateCompany = () => {
+      try {
+        const userData = JSON.parse(sessionStorage.getItem("userData"));
+        const newCompany = userData?.company?.toLowerCase() || "";
+        setCompany(newCompany);
+      } catch (e) {
+        setCompany("");
+      }
+    };
+
+    // Initial load
+    updateCompany();
+
+    // Binabasa every 1ms ang sessionStorage
+    const pollInterval = setInterval(() => {
+      updateCompany();
+    }, 1);
+
+    // Listen for custom event (for same tab updates)
+    const handleCompanyChange = () => {
+      updateCompany();
+    };
+
+    window.addEventListener('companyChanged', handleCompanyChange);
+    window.addEventListener('storage', handleCompanyChange);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('companyChanged', handleCompanyChange);
+      window.removeEventListener('storage', handleCompanyChange);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -18,15 +54,6 @@ const Header = ({isHeaderOpen }) => {
       console.error("Error signing out:", error);
     }
   };
-
-  // get data in sessionStorage
-  let company = "";
-  try {
-    const userData = JSON.parse(sessionStorage.getItem("userData"));
-    company = userData?.company?.toLowerCase() || "";
-  } catch (e) {
-    company = "";
-  }
 
   // list of logos 
   const CompanyLogo = [

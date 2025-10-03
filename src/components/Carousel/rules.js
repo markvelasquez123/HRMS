@@ -5,17 +5,43 @@ function OrgChartCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [rules, setRules] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
+  const [company, setCompany] = useState("");
 
-  let company = "";
-  try {
-    const userData = JSON.parse(sessionStorage.getItem('userData'));
-    company = userData?.company?.toLowerCase() || "";
-  } catch (e) {
-    company = "";
-  }
+  useEffect(() => {
+    const updateCompany = () => {
+      try {
+        const userData = JSON.parse(sessionStorage.getItem('userData'));
+        const newCompany = userData?.company?.toLowerCase() || "";
+        setCompany(newCompany);
+      } catch (e) {
+        setCompany("");
+      }
+    };
+
+    // Initial load
+    updateCompany();
+
+    //binabasa every 1ms ang sessionStorage
+    const pollInterval = setInterval(() => {
+      updateCompany();
+    }, 1);
+
+    // Listen for custom event (for same tab updates)
+    const handleCompanyChange = () => {
+      updateCompany();
+    };
+
+    window.addEventListener('companyChanged', handleCompanyChange);
+    window.addEventListener('storage', handleCompanyChange);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('companyChanged', handleCompanyChange);
+      window.removeEventListener('storage', handleCompanyChange);
+    };
+  }, []);
   
-  // Define themes for each company
   const companyThemes = {
     "asia navis": {
       gradient: "from-blue-600 to-blue-100",
@@ -37,7 +63,6 @@ function OrgChartCarousel() {
     },
   };
 
-  // Get the current theme or fall back to a default
   const currentTheme = companyThemes[company] || companyThemes["asia navis"];
 
   const getRules = () => {
