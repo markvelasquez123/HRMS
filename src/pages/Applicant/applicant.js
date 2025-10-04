@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaSearch, FaUser } from "react-icons/fa";
 import ApplicantSidebar from "../../components/applicant/applicantSidebar";
 import importExcel from "../../components/Excelimport/importExcel"; 
-
+import PositionDropdown from "../../components/applicant/PositionDropdown";
+import AddApplicant from "../../components/applicant/AddApplicantForm"
 const API_URL = "http://localhost/HRMSbackend/get_applicants.php";
 
 const ApplicantPage = () => {
@@ -13,15 +14,16 @@ const ApplicantPage = () => {
   const [error, setError] = useState("");
   const [removedApplicants, setRemovedApplicants] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
-
+  const [showAddForm, setShowAddForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [applicantsPerPage] = useState(15);
+ 
+  const [selectedPosition, setSelectedPosition] = useState("");
 
-  const hasFetchedRef = useRef(false); // Track if we've already fetched
-  const isFetchingRef = useRef(false); // Prevent concurrent fetches
+  const hasFetchedRef = useRef(false); 
+  const isFetchingRef = useRef(false); 
 
   const fetchApplicants = async () => {
-    // Prevent duplicate fetches
     if (isFetchingRef.current) {
       console.log("Already fetching, skipping...");
       return;
@@ -83,22 +85,17 @@ const ApplicantPage = () => {
     }
   };
 
-  // Main useEffect for initial fetch only
   useEffect(() => {
-    // Only fetch once on mount
     if (!hasFetchedRef.current) {
       console.log("Initial mount - fetching data");
       hasFetchedRef.current = true;
       fetchApplicants();
     }
-
-    // Cleanup function
     return () => {
       console.log("Component unmounting or re-rendering");
     };
-  }, []); // Empty dependency array - only run once
+  }, []);
 
-  // Separate useEffect for event listeners
   useEffect(() => {
     const handleRefresh = () => {
       console.log("Refresh event triggered");
@@ -131,14 +128,12 @@ const ApplicantPage = () => {
       window.removeEventListener("refreshApplicants", handleRefresh);
       window.removeEventListener("applicantStatusChange", handleApplicantStatusChange);
     };
-  }, []); // Empty dependency array
+  }, []);
 
-  // Reset to page 1 when search changes
+  
   useEffect(() => {
-    if (searchQuery !== "") {
-      setCurrentPage(1);
-    }
-  }, [searchQuery]);
+    setCurrentPage(1);
+  }, [searchQuery, selectedPosition]);
 
   const handleSelectApplicant = (applicant) => {
     setSelectedApplicant(applicant);
@@ -173,10 +168,13 @@ const ApplicantPage = () => {
 
   const filteredApplicants = applicants.filter((applicant) => {
     const searchLower = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = (
       applicant.firstName?.toLowerCase().includes(searchLower) ||
       applicant.lastName?.toLowerCase().includes(searchLower)
     );
+    const matchesPosition = selectedPosition === "" || applicant.position === selectedPosition;
+    
+    return matchesSearch && matchesPosition;
   });
   
   const indexOfLastApplicant = currentPage * applicantsPerPage;
@@ -202,14 +200,19 @@ const ApplicantPage = () => {
           }}
         />
       )}
+      {showAddForm && (
+        <AddApplicant
+          onClose={() => setShowAddForm(false)} 
+        />
+      )}
       <div className="p-6 text-gray-800">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Applicant ({applicants.length} total)
+           <h2 className="text-2xl font-semibold text-gray-800">
+            Applicant
           </h2>
           <div className="flex items-center gap-4">
             <button
-              className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
+              className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
               onClick={handleExport}>
               Export Excel File
             </button>
@@ -221,8 +224,14 @@ const ApplicantPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <FaSearch className="absolute left-3 top-3 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
+            <PositionDropdown onPositionChange={setSelectedPosition} />
+            <button 
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+              onClick={() => setShowAddForm(true)}>
+                Add Applicant
+            </button>
           </div>
         </div>
 

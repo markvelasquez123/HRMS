@@ -213,7 +213,7 @@ const EmployeePage = () => {
       {showAddForm && (
   <AddEmployee 
     onClose={() => setShowAddForm(false)}
-    onSuccess={() => loadEmployees()} // This will refresh the employee list after adding
+    onSuccess={() => loadEmployees()} 
   />
 )}
       <div className="p-6 text-gray-800">

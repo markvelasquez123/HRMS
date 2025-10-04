@@ -2,7 +2,7 @@ import React, { useState, useReducer } from "react";
 import { X, AlertCircle } from "lucide-react";
 
 const initialFormState = {
-  IDNumber: "", FirstName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
+  IDNumber: "", FirstName: "", MiddleName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
   EmailAddress: "", ContactNumber: "", Gender: "", EmployeeType: "", Company: "",
   HomeAddress: "", Passport: ""
 };
@@ -41,7 +41,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering", "Architect", "Operation", "Director"];
-  const basicFields = ["IDNumber", "FirstName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "Gender", "EmployeeType", "Company", "Passport"];
+  const basicFields = ["IDNumber", "FirstName", "MiddleName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "Gender", "EmployeeType", "Company", "Passport"];
   const contactFields = ["EmailAddress", "ContactNumber"];
   const addressFields = ["HomeAddress"];
 
@@ -94,22 +94,9 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
-    console.log("Form Data:", formData);
-
     if (!isFormValid()) {
-      
       const requiredFields = ["IDNumber", "FirstName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "Gender", "EmployeeType", "Company", "HomeAddress", "Passport"];
       const missingFields = requiredFields.filter(field => !formData[field] || formData[field].toString().trim() === "");
-      
-     
-      console.log("Missing fields:", missingFields);
-      console.log("ContactNumber valid (numbers only):", /^\d+$/.test(formData.ContactNumber));
-      console.log("FirstName valid (letters only):", isOnlyLetters(formData.FirstName));
-      console.log("LastName valid (letters only):", isOnlyLetters(formData.LastName));
-      console.log("PositionApplied valid (letters only):", isOnlyLetters(formData.PositionApplied));
-      console.log("Age 18+:", isAtLeast18(formData.Birthdate));
-      console.log("Company selected:", formData.Company);
       
       if (missingFields.length > 0) {
         const fieldNames = missingFields.map(f => {
@@ -148,24 +135,10 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
       submitFormData.append(key, formData[key] || '');
     });
     
-    console.log("Sending to backend:");
-    for (let [key, value] of submitFormData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-    
     try {
       const response = await fetch("http://localhost/HRMSbackend/test2.php", {
         method: 'POST',
         body: submitFormData
-      }).catch(err => {
-        // Ignore extension-related errors
-        if (err.message && err.message.includes('message channel closed')) {
-          return fetch("http://localhost/HRMSbackend/test2.php", {
-            method: 'POST',
-            body: submitFormData
-          });
-        }
-        throw err;
       });
       
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -205,17 +178,13 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
         setSuccess('Employee added successfully!');
         resetForm();
         if (onSuccess) onSuccess();
-        
-       
-        setTimeout(() => {
-          if (onClose) onClose();
-        }, 2000);
+        if (onClose) onClose();
       } else {
         setError(result.message || 'Unknown error occurred');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      setError(`Error submitting form: ${error.message}. Please check your PHP backend and server logs.`);
+      setError(`Error submitting form: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -223,7 +192,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
 
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
-      IDNumber: "Employee ID", FirstName: "First Name", LastName: "Last Name", DateHired: "Hire Date",
+      IDNumber: "Employee ID", FirstName: "First Name", MiddleName: "Middle Name", LastName: "Last Name", DateHired: "Hire Date",
       Birthdate: "Birth Date", EmployeeType: "Employee Type", Company: "Company", PositionApplied: "Position", 
       Department: "Department", Passport: "Passport"
     };
@@ -234,7 +203,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
       value: formData[field] || "",
       onChange: handleChange,
       className: "w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-      required: isRequired
+      required: field === "MiddleName" ? false : isRequired
     };
 
     if (field === "Department") {
@@ -292,7 +261,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
     return (
       <div key={field} className="space-y-1">
         <label className="block text-sm font-medium text-gray-700">
-          {label} {isRequired && "*"}
+          {label} {field === "MiddleName" ? "" : isRequired ? "*" : ""}
         </label>
         <input
           {...commonProps}
