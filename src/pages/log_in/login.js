@@ -5,7 +5,7 @@ import MainLogo from "../../assets/Mainlogo.png";
 
 const LoginPage = () => {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [EmailAddress, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [company, setCompany] = useState("");
    const [error, setError] = useState("");
@@ -27,7 +27,7 @@ const LoginPage = () => {
     setError("");
     
     const trimmedName = name.trim();
-    const trimmedEmail = email.trim();
+    const trimmedEmail = EmailAddress.trim();
     const trimmedPassword = password.trim();
   const trimmedCompany = company.trim();
 
@@ -65,12 +65,12 @@ const LoginPage = () => {
       const body = isSignUp
         ? {
             name: trimmedName,
-            email: trimmedEmail,
+            EmailAddress: trimmedEmail,
             password: trimmedPassword,
             company: trimmedCompany,
           }
         : {
-            email: trimmedEmail,
+            EmailAddress: trimmedEmail,
             password: trimmedPassword,
           };
       
@@ -88,7 +88,7 @@ const LoginPage = () => {
           resetForm();
           setIsSignUp(false); 
         } else {
-          sessionStorage.setItem('userEmail', email);
+          sessionStorage.setItem('userEmail', EmailAddress);
           window.dispatchEvent(new Event('companyChanged'));
           const v = sessionStorage.getItem('userEmail');
           
@@ -159,7 +159,7 @@ const LoginPage = () => {
             <input
               id="email"
               type="email"
-              value={email}
+              value={EmailAddress}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@company.com"
               required

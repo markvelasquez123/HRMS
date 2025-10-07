@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 export default function HRMSBanner() {
-  const [company, setCompany] = useState("");
+  const [Company, setCompany] = useState("");
 
   useEffect(() => {
     const updateCompany = () => {
       try {
         const userData = JSON.parse(sessionStorage.getItem('userData'));
-        const newCompany = userData?.company?.toLowerCase() || "";
+        const newCompany = userData?.Company || "";  // Remove .toLowerCase()
         setCompany(newCompany);
       } catch (e) {
         setCompany("");
@@ -38,12 +38,12 @@ export default function HRMSBanner() {
   }, []);
 
   const companyGradients = {
-    "asia navis": "from-blue-600 to-blue-300",
-    "peak hr": "from-orange-500 to-blue-500",
-    "rigel": "from-teal-600 to-cyan-400",
+    "Asia Navis": "from-blue-600 to-blue-300",
+    "PeakHR": "from-orange-500 to-blue-500",
+    "Rigel": "from-teal-600 to-cyan-400",
   };
 
-  const currentGradient = companyGradients[company] || companyGradients["asia navis"];
+  const currentGradient = companyGradients[Company] || companyGradients["Asia Navis"];
 
   return (
     <div className={`relative overflow-hidden bg-gradient-to-r ${currentGradient} text-white`}>

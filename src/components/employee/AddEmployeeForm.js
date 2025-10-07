@@ -2,7 +2,7 @@ import React, { useState, useReducer } from "react";
 import { X, AlertCircle } from "lucide-react";
 
 const initialFormState = {
-  IDNumber: "", FirstName: "", MiddleName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
+  FirstName: "", MiddleName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
   EmailAddress: "", ContactNumber: "", Gender: "", EmployeeType: "", Company: "",
   HomeAddress: "", Passport: ""
 };
@@ -41,7 +41,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering", "Architect", "Operation", "Director"];
-  const basicFields = ["IDNumber", "FirstName", "MiddleName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "Gender", "EmployeeType", "Company", "Passport"];
+  const basicFields = ["FirstName", "MiddleName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "Gender", "EmployeeType", "Company", "Passport"];
   const contactFields = ["EmailAddress", "ContactNumber"];
   const addressFields = ["HomeAddress"];
 
@@ -68,7 +68,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
   };
 
   const isFormValid = () => {
-    const requiredFields = ["IDNumber", "FirstName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "Gender", "EmployeeType", "Company", "HomeAddress", "Passport"];
+    const requiredFields = ["FirstName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "Gender", "EmployeeType", "Company", "HomeAddress", "Passport"];
     const textAndDateValid = requiredFields.every((field) => {
       if (field === "Birthdate" || field === "DateHired") {
         const dateValue = formData[field];
@@ -95,15 +95,15 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
     e.preventDefault();
 
     if (!isFormValid()) {
-      const requiredFields = ["IDNumber", "FirstName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "Gender", "EmployeeType", "Company", "HomeAddress", "Passport"];
+      const requiredFields = ["FirstName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "EmailAddress", "ContactNumber", "Gender", "EmployeeType", "Company", "HomeAddress", "Passport"];
       const missingFields = requiredFields.filter(field => !formData[field] || formData[field].toString().trim() === "");
       
       if (missingFields.length > 0) {
         const fieldNames = missingFields.map(f => {
           const labelMap = {
-            IDNumber: "Employee ID", FirstName: "First Name", LastName: "Last Name", DateHired: "Hire Date",
+            FirstName: "First Name", LastName: "Last Name", DateHired: "Hire Date",
             Birthdate: "Birth Date", EmployeeType: "Employee Type", PositionApplied: "Position", ContactNumber: "Contact Number",
-            EmailAddress: "Email Address", HomeAddress: "Home Address"
+            EmailAddress: "Email Address", HomeAddress: "Home Address", Passport: "Passport"
           };
           return labelMap[f] || f;
         }).join(", ");
@@ -112,12 +112,6 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
         setError('Employee must be at least 18 years old');
       } else if (!/^\d+$/.test(formData.ContactNumber)) {
         setError('Contact Number must contain only numbers');
-      } else if (!isOnlyLetters(formData.FirstName)) {
-        setError('First Name must contain only letters');
-      } else if (!isOnlyLetters(formData.LastName)) {
-        setError('Last Name must contain only letters');
-      } else if (!isOnlyLetters(formData.PositionApplied)) {
-        setError('Position must contain only letters');
       } else if (!formData.Company || formData.Company === "") {
         setError('Please select a Company');
       } else {
@@ -160,25 +154,29 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
               headers: { "Content-Type": "application/json" },
               credentials: "include",
               body: JSON.stringify({
-                name: `${formData.FirstName} ${formData.LastName}`,
-                email: formData.EmailAddress,
-                password: "123123",
-                company: formData.Company
-              })
+  FirstName: formData.FirstName,
+  MiddleName: formData.MiddleName,
+  LastName: formData.LastName,
+  email: formData.EmailAddress,
+  password: "123123",
+  company: formData.Company,
+  dateHired: formData.DateHired  // Add this line
+})
             });
-            const signupJson = await signupResp.json();
-            if (!signupJson.success) {
-              console.error("Signup failed:", signupJson.message);
+            if (!signupResp.success) {
+              console.error("Signup failed:", signupResp.message);
             }
           } catch (signupErr) {
             console.error("Signup request error:", signupErr);
           }
         }
 
-        setSuccess('Employee added successfully!');
+        setSuccess(`Employee added successfully! ID: ${result.IDNumber || 'Generated'}`);
         resetForm();
         if (onSuccess) onSuccess();
-        if (onClose) onClose();
+        setTimeout(() => {
+          if (onClose) onClose();
+        }, 2000);
       } else {
         setError(result.message || 'Unknown error occurred');
       }
@@ -192,7 +190,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
 
   const renderFormField = (field, isRequired = true) => {
     const labelMap = {
-      IDNumber: "Employee ID", FirstName: "First Name", MiddleName: "Middle Name", LastName: "Last Name", DateHired: "Hire Date",
+      FirstName: "First Name", MiddleName: "Middle Name", LastName: "Last Name", DateHired: "Hire Date",
       Birthdate: "Birth Date", EmployeeType: "Employee Type", Company: "Company", PositionApplied: "Position", 
       Department: "Department", Passport: "Passport"
     };
@@ -238,7 +236,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
             <option value="">Select Company</option>
             <option value="Asia Navis">Asia Navis</option>
             <option value="Rigel">Rigel</option>
-            <option value="Peak HR">Peak HR</option>
+            <option value="PeakHR">PeakHR</option>
           </select>
         </div>
       );

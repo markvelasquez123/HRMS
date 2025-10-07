@@ -6,13 +6,13 @@ function OrgChartCarousel() {
   const [rules, setRules] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [company, setCompany] = useState("");
+  const [Company, setCompany] = useState("");
 
   useEffect(() => {
     const updateCompany = () => {
       try {
         const userData = JSON.parse(sessionStorage.getItem('userData'));
-        const newCompany = userData?.company?.toLowerCase() || "";
+        const newCompany = userData?.Company || "";
         setCompany(newCompany);
       } catch (e) {
         setCompany("");
@@ -43,19 +43,19 @@ function OrgChartCarousel() {
   }, []);
   
   const companyThemes = {
-    "asia navis": {
+    "Asia Navis": {
       gradient: "from-blue-600 to-blue-100",
       accentColor: "text-blue-600",
       borderColor: "border-blue-500",
       indicatorColor: "bg-blue-600",
     },
-    "peak hr": {
+    "PeakHR": {
       gradient: "from-orange-500 to-blue-300",
       accentColor: "text-orange-500",
       borderColor: "border-orange-500",
       indicatorColor: "bg-orange-500",
     },
-    "rigel": {
+    "Rigel": {
       gradient: "from-teal-600 to-cyan-400",
       accentColor: "text-teal-600",
       borderColor: "border-teal-500",
@@ -63,7 +63,7 @@ function OrgChartCarousel() {
     },
   };
 
-  const currentTheme = companyThemes[company] || companyThemes["asia navis"];
+  const currentTheme = companyThemes[Company] || companyThemes["asia navis"];
 
   const getRules = () => {
     fetch("http://localhost/HRMSbackend/rules.php")

@@ -10,13 +10,13 @@ import { signOut } from "firebase/auth";
 const Header = ({isHeaderOpen }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [company, setCompany] = useState("");
+  const [Company, setCompany] = useState("");
 
   useEffect(() => {
     const updateCompany = () => {
       try {
         const userData = JSON.parse(sessionStorage.getItem("userData"));
-        const newCompany = userData?.company?.toLowerCase() || "";
+        const newCompany = userData?.Company || "";
         setCompany(newCompany);
       } catch (e) {
         setCompany("");
@@ -58,22 +58,22 @@ const Header = ({isHeaderOpen }) => {
   // list of logos 
   const CompanyLogo = [
     {
-      company: "asia navis",
+      company: "Asia Navis",
       subLogo: SubLogo,
     },
     {
-      company: "rigel",
+      company: "Rigel",
       subLogo: SubLogoRigel,
     },
     {
-      company: "peak hr",
+      company: "PeakHR",
       subLogo: SubLogoPeak,
     },
   ];
 
   // pick logo based on logged in company 
   const activeLogo =
-    CompanyLogo.find((item) => item.company === company) || CompanyLogo[0];
+    CompanyLogo.find((item) => item.company === Company) || CompanyLogo[0];
 
   return (
     <aside
