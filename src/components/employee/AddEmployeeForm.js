@@ -119,7 +119,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
       }
       return;
     }
-
+    
     setLoading(true);
     setError(null);
     setSuccess(null);

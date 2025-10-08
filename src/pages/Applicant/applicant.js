@@ -56,7 +56,8 @@ const ApplicantPage = () => {
           return {
             ...summary,
             ...details,
-            uid: summary.EmailAddress || `applicant_${index}`,
+            
+            uid: summary.appID || `applicant_${index}`, 
             firstName: summary.FirstName || "N/A",
             lastName: summary.LastName || "N/A",
             email: summary.EmailAddress || "N/A",
