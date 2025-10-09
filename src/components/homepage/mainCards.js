@@ -7,23 +7,65 @@ const MainCards = () => {
   const [applicantCount, setApplicantCount] = useState(0);
   const [poolCount, setPoolCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [currentOrg, setCurrentOrg] = useState('');
 
+  
   useEffect(() => {
+    const checkSessionStorage = () => {
+      const userDataString = sessionStorage.getItem('userData');
+      if (userDataString) {
+        const userData = JSON.parse(userDataString);
+        const userCompany = userData.Company;
+        
+       
+        let orgPrefix = '';
+        if (userCompany === 'Rigel') {
+          orgPrefix = 'RGL';
+        } else if (userCompany === 'Asia Navis') {
+          orgPrefix = 'ASN';
+        } else if (userCompany === 'PeakHR') {
+          orgPrefix = 'PHR';
+        }
+        
+      
+        if (orgPrefix !== currentOrg) {
+          console.log("Organization changed to:", orgPrefix);
+          setCurrentOrg(orgPrefix);
+        }
+      }
+    };
+
+    
+    checkSessionStorage();
+
+    
+    const interval = setInterval(checkSessionStorage, 1);
+
+    return () => clearInterval(interval);
+  }, [currentOrg]);
+
+  
+  useEffect(() => {
+    if (!currentOrg) return;
+
     const fetchCounts = async () => {
       try {
         setLoading(true);
         
-        // Fetch employees from the backend
+        console.log("Fetching counts for organization:", currentOrg);
+        
+        // Fetch employees with org parameter (THIS WAS MISSING!)
         const employeeResponse = await axios.get(
-          "http://localhost/HRMSbackend/test.php?action=get",
+          `http://localhost/HRMSbackend/test.php?action=get&org=${currentOrg}`,
           {
             headers: {
               "Content-Type": "application/json",
             },
+            withCredentials: true,
           }
         );
         
-        // Check if response data is an array and set count
+        
         if (Array.isArray(employeeResponse.data)) {
           setEmployeeCount(employeeResponse.data.length);
           console.log(`Employee count updated: ${employeeResponse.data.length}`);
@@ -32,13 +74,14 @@ const MainCards = () => {
           setEmployeeCount(0);
         }
 
-        // Fetch applicants from the same endpoint as ApplicantPage.js
+        // Fetch applicants with org parameter
         const applicantResponse = await axios.get(
-          "http://localhost/HRMSbackend/get_applicants.php",
+          `http://localhost/HRMSbackend/get_applicants.php?org=${currentOrg}`,
           {
             headers: {
               "Content-Type": "application/json",
             },
+            withCredentials: true,
           }
         );
         
@@ -91,12 +134,12 @@ const MainCards = () => {
     };
 
     fetchCounts();
-  }, []);
+  }, [currentOrg]); 
 
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1, 2, 3,].map((i) => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center animate-pulse">
             <div className="h-6 bg-gray-200 rounded w-20 mb-2"></div>
             <div className="h-10 bg-gray-200 rounded w-16"></div>
@@ -129,7 +172,7 @@ const MainCards = () => {
       </Link>
       <Link to="/OverseasEmployees" className="no-underline">
         <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-red-50 cursor-pointer transition">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">OFW  </h3>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">OFW</h3>
         </div>
       </Link>
       <Link to="/Statistics" className="no-underline">

@@ -24,67 +24,115 @@ const ApplicantPage = () => {
   const isFetchingRef = useRef(false); 
 
   const fetchApplicants = async () => {
-    if (isFetchingRef.current) {
-      console.log("Already fetching, skipping...");
-      return;
-    }
+  if (isFetchingRef.current) {
+    console.log("Already fetching, skipping...");
+    return;
+  }
+  
+  try {
+    isFetchingRef.current = true;
+    setLoading(true);
+    console.log("Fetching applicants...");
     
-    try {
-      isFetchingRef.current = true;
-      setLoading(true);
-      console.log("Fetching applicants...");
-      
-      const response = await fetch(API_URL, {
-        method: 'GET',
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      console.log("Received data:", responseData);
-      
-      if (responseData && Array.isArray(responseData.summary)) {
-        const mergedApplicants = responseData.summary.map((summary, index) => {
-          const details = responseData.details?.find(detail => 
-            (detail.EmailAddress && detail.EmailAddress === summary.EmailAddress) ||
-            (detail.FirstName === summary.FirstName && detail.LastName === summary.LastName)
-          ) || {};
-          return {
-            ...summary,
-            ...details,
-            
-            uid: summary.appID || `applicant_${index}`, 
-            firstName: summary.FirstName || "N/A",
-            lastName: summary.LastName || "N/A",
-            email: summary.EmailAddress || "N/A",
-            phone: summary.ContactNumber || details.ContactNumber || "N/A",
-            position: summary.PositionApplied || details.PositionApplied || "N/A"
-          };
-        });
-        
-        console.log("Setting applicants, count:", mergedApplicants.length);
-        setApplicants(mergedApplicants);
-        setError("");
-      } else if (responseData.error) {
-        setApplicants([]);
-        setError(responseData.error);
-      } else {
-        setApplicants([]);
-        setError("Unexpected response format from server.");
-      }
-    } catch (error) {
-      console.error('Fetch error:', error);
-      setError("Failed to fetch applicants.");
+    // Get userData from sessionStorage
+    const userDataString = sessionStorage.getItem('userData');
+    
+    if (!userDataString) {
+      setError("User data not found. Please log in again.");
       setApplicants([]);
-    } finally {
       setLoading(false);
       isFetchingRef.current = false;
+      return;
     }
-  };
+
+    // Parse userData JSON
+    const userData = JSON.parse(userDataString);
+    const userCompany = userData.Company; // Get Company field
+    
+    if (!userCompany) {
+      setError("User company not found. Please log in again.");
+      setApplicants([]);
+      setLoading(false);
+      isFetchingRef.current = false;
+      return;
+    }
+
+    // Map company name to prefix
+    let orgPrefix = '';
+    if (userCompany === 'Rigel') {
+      orgPrefix = 'RGL';
+    } else if (userCompany === 'Asia Navis') {
+      orgPrefix = 'ASN';
+    } else if (userCompany === 'PeakHR') {
+      orgPrefix = 'PHR';
+    } else {
+      setError(`Unknown company: ${userCompany}`);
+      setApplicants([]);
+      setLoading(false);
+      isFetchingRef.current = false;
+      return;
+    }
+
+    console.log("User Company:", userCompany, "Prefix:", orgPrefix);
+    
+    // Send the prefix to backend
+    const response = await fetch(`${API_URL}?org=${orgPrefix}`, {
+      method: 'GET',
+      headers: { "Content-Type": "application/json" },
+      credentials: 'include'
+    });
+
+    if (response.status === 401) {
+      setError("Please log in to view applicants.");
+      setApplicants([]);
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    console.log("Received data:", responseData);
+    
+    if (responseData && Array.isArray(responseData.summary)) {
+      const mergedApplicants = responseData.summary.map((summary, index) => {
+        const details = responseData.details?.find(detail => 
+          (detail.EmailAddress && detail.EmailAddress === summary.EmailAddress) ||
+          (detail.FirstName === summary.FirstName && detail.LastName === summary.LastName)
+        ) || {};
+        return {
+          ...summary,
+          ...details,
+          
+          uid: summary.appID || `applicant_${index}`, 
+          firstName: summary.FirstName || "N/A",
+          lastName: summary.LastName || "N/A",
+          email: summary.EmailAddress || "N/A",
+          phone: summary.ContactNumber || details.ContactNumber || "N/A",
+          position: summary.PositionApplied || details.PositionApplied || "N/A"
+        };
+      });
+      
+      console.log("Setting applicants, count:", mergedApplicants.length);
+      setApplicants(mergedApplicants);
+      setError("");
+    } else if (responseData.error) {
+      setApplicants([]);
+      setError(responseData.error);
+    } else {
+      setApplicants([]);
+      setError("Unexpected response format from server.");
+    }
+  } catch (error) {
+    console.error('Fetch error:', error);
+    setError("Failed to fetch applicants.");
+    setApplicants([]);
+  } finally {
+    setLoading(false);
+    isFetchingRef.current = false;
+  }
+};
 
   useEffect(() => {
     if (!hasFetchedRef.current) {

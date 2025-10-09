@@ -152,31 +152,76 @@ const EmployeeSidebar = ({ employee, onClose }) => {
 };
 
 const EmployeePage = () => {
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
   const [employeeList, setEmployeeList] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [error, setError] = useState(null);
+  const [currentOrg, setCurrentOrg] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering", "Architect", "Operation", "Director"];
   const companysort = ["ASIANAVIS", "RIGEL", "PEAKHR"];
 
+ 
   useEffect(() => {
-    loadEmployees();
-  }, []);
+    const checkSessionStorage = () => {
+      const userDataString = sessionStorage.getItem('userData');
+      if (userDataString) {
+        const userData = JSON.parse(userDataString);
+        const userCompany = userData.Company;
+
+        let orgPrefix = '';
+        if (userCompany === 'Rigel') {
+          orgPrefix = 'RGL';
+        } else if (userCompany === 'Asia Navis') {
+          orgPrefix = 'ASN';
+        } else if (userCompany === 'PeakHR') {
+          orgPrefix = 'PHR';
+        }
+
+        if (orgPrefix !== currentOrg) {
+          console.log("Organization changed to:", orgPrefix);
+          setCurrentOrg(orgPrefix);
+        }
+      }
+    };
+
+    checkSessionStorage();
+    const interval = setInterval(checkSessionStorage, 1);
+    return () => clearInterval(interval);
+  }, [currentOrg]);
+
+
+  useEffect(() => {
+    if (currentOrg) {
+      loadEmployees();
+    }
+  }, [currentOrg]);
 
   const loadEmployees = async () => {
+    if (!currentOrg) {
+      console.warn("No organization set, skipping employee load");
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost/HRMSbackend/test.php?action=get');
+      const response = await fetch(`http://localhost/HRMSbackend/test.php?action=get&org=${currentOrg}`, {
+        credentials: 'include'
+      });
+      
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text();
         console.error("Non-JSON response:", text);
         throw new Error("Server returned non-JSON response");
       }
+      
       const employees = await response.json();
+      console.log(`Loaded ${employees.length} employees for ${currentOrg}`);
       setEmployeeList(employees);
     } catch (error) {
       console.error("Error loading employees:", error);
@@ -211,11 +256,12 @@ const EmployeePage = () => {
       
       {selectedEmployee && <EmployeeSidebar employee={selectedEmployee} onClose={() => setSelectedEmployee(null)} />}
       {showAddForm && (
-  <AddEmployee 
-    onClose={() => setShowAddForm(false)}
-    onSuccess={() => loadEmployees()} 
-  />
-)}
+        <AddEmployee 
+          onClose={() => setShowAddForm(false)}
+          onSuccess={() => loadEmployees()} 
+        />
+      )}
+      
       <div className="p-6 text-gray-800">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">Employees</h2>
@@ -236,11 +282,11 @@ const EmployeePage = () => {
               Export Excel File
             </button>
             <button 
-  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
-  onClick={() => setShowAddForm(true)}
->
-  + Add Employee
-</button>
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" 
+              onClick={() => setShowAddForm(true)}
+            >
+              + Add Employee
+            </button>
             <div className="relative">
               <input type="text" placeholder="Name" 
                 className="border border-gray-300 p-2 pl-10 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-200" 

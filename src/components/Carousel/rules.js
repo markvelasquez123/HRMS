@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+// import ASNrules from "../assets/asnrules.jpg";
 
 function OrgChartCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -63,7 +64,7 @@ function OrgChartCarousel() {
     },
   };
 
-  const currentTheme = companyThemes[Company] || companyThemes["asia navis"];
+  const currentTheme = companyThemes[Company] || companyThemes["Asia Navis"];
 
   const getRules = () => {
     fetch("http://localhost/HRMSbackend/rules.php")

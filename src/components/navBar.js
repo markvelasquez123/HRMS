@@ -49,8 +49,7 @@ const Navbar = ({ toggleSidebar }) => {
   const CompanyLogo = [
     { company: "Asia Navis", Logo: Logo1 },
     { company: "Rigel", Logo: Logo2 },
-    { company: "PeakHR", Logo: Logo3 },
-    { company: "peakhr", Logo: Logo3 }
+    { company: "PeakHR", Logo: Logo3 }
   ];
   
   const activeLogo = CompanyLogo.find((item) => item.company === Company) || CompanyLogo[0];
@@ -66,7 +65,7 @@ const Navbar = ({ toggleSidebar }) => {
 
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost/HRMSbackend/test.php", {
+      const response = await fetch("http://localhost/HRMSbackend/test3.php", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include"
