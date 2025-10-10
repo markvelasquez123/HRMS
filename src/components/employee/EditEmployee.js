@@ -45,7 +45,7 @@ const EditEmployeeModal = ({ employee, onClose, onUpdate }) => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost/HRMSbackend/update_employee.php', {
+      const response = await fetch('http://localhost/HRMSbackend/editemployee.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

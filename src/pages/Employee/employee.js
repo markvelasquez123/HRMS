@@ -162,7 +162,7 @@ const EmployeePage = () => {
   const [currentOrg, setCurrentOrg] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering", "Architect", "Operation", "Director"];
-  const companysort = ["ASIANAVIS", "RIGEL", "PEAKHR"];
+  
 
  
   useEffect(() => {
@@ -271,11 +271,7 @@ const EmployeePage = () => {
               <option value="">Departments</option>
               {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
             </select>
-            <select className="border border-gray-300 p-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-200"
-              value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)}>
-              <option value="">Company</option>
-              {companysort.map(comp => <option key={comp} value={comp}>{comp}</option>)}
-            </select>
+            
 
             <button className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
               onClick={handleExport}>
