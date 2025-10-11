@@ -234,22 +234,22 @@ const Navbar = ({ toggleSidebar }) => {
                       </div>
                       <span className="text-sm font-medium text-gray-900">{userData.DateHired}</span>
                     </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-sm">
+                        <FileText className="w-4 h-4 text-gray-500 mr-2 flex-shrink-0" />
+                        <span className="text-gray-600">Passport</span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{userData.Passport}</span>
+                    </div>
                   </div>
                 </div>
                 
-                {userData.Passport && (
+                {(
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                       <FileText className="w-4 h-4 text-gray-600 mr-2 flex-shrink-0" />
                       Documents
                     </h4>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <a href={`http://localhost/HRMSbackend/uploads/${userData.Passport}`} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md transition-colors">
-                        <FileText className="w-4 h-4 mr-3 flex-shrink-0" />
-                        <span>View Passport</span>
-                      </a>
-                    </div>
                   </div>
                 )}
               </div>

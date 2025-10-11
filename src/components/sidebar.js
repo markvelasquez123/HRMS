@@ -23,15 +23,15 @@ const Header = ({isHeaderOpen }) => {
       }
     };
 
-    // Initial load
+   
     updateCompany();
 
-    // Binabasa every 1ms ang sessionStorage
+    
     const pollInterval = setInterval(() => {
       updateCompany();
     }, 1);
 
-    // Listen for custom event (for same tab updates)
+   
     const handleCompanyChange = () => {
       updateCompany();
     };
@@ -55,7 +55,7 @@ const Header = ({isHeaderOpen }) => {
     }
   };
 
-  // list of logos 
+  
   const CompanyLogo = [
     {
       company: "Asia Navis",

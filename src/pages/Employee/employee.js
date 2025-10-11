@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { X, User, Phone, Mail, MapPin, Cake, Briefcase, Building, FileText, CreditCard, Search, AlertCircle } from "lucide-react";
 import ExcelImport from "../../components/Excelimport/importExcel";
 import EditEmployeeModal from "../../components/employee/EditEmployee"; 
@@ -193,22 +193,18 @@ const EmployeePage = () => {
     return () => clearInterval(interval);
   }, [currentOrg]);
 
-
-  useEffect(() => {
-    if (currentOrg) {
-      loadEmployees();
-    }
-  }, [currentOrg]);
-
-  const loadEmployees = async () => {
+  const loadEmployees = useCallback(async () => {
     if (!currentOrg) {
       console.warn("No organization set, skipping employee load");
       return;
     }
 
+    console.log(`📊 Loading employees for org: ${currentOrg}`);
+    
     try {
       const response = await fetch(`http://localhost/HRMSbackend/test.php?action=get&org=${currentOrg}`, {
-        credentials: 'include'
+        credentials: 'include',
+        cache: 'no-cache'
       });
       
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -221,13 +217,56 @@ const EmployeePage = () => {
       }
       
       const employees = await response.json();
-      console.log(`Loaded ${employees.length} employees for ${currentOrg}`);
+      console.log(`✅ Loaded ${employees.length} employees for ${currentOrg}`, employees);
       setEmployeeList(employees);
     } catch (error) {
-      console.error("Error loading employees:", error);
+      console.error("❌ Error loading employees:", error);
       setError("Failed to load employees: " + error.message);
     }
-  };
+  }, [currentOrg]);
+
+  useEffect(() => {
+    if (currentOrg) {
+      loadEmployees();
+    }
+  }, [currentOrg, loadEmployees]);
+
+  
+  useEffect(() => {
+    const handleRefreshEmployees = () => {
+      console.log('🔄 Refresh employees event received!');
+      console.log('Current org:', currentOrg);
+      loadEmployees();
+    };
+
+    const handleEmployeeAdded = (event) => {
+      console.log('➕ Employee added event received!', event.detail);
+      console.log('Current org:', currentOrg);
+      loadEmployees();
+    };
+
+    const handleApplicantStatusChange = (event) => {
+      console.log('📋 Applicant status change event received!', event.detail);
+      if (event.detail?.status === 'Accepted') {
+        console.log('Current org:', currentOrg);
+        loadEmployees();
+      }
+    };
+
+    
+    window.addEventListener('refreshEmployees', handleRefreshEmployees);
+    window.addEventListener('employeeAdded', handleEmployeeAdded);
+    window.addEventListener('applicantStatusChange', handleApplicantStatusChange);
+
+    console.log('✅ Employee event listeners registered for org:', currentOrg);
+
+    
+    return () => {
+      window.removeEventListener('refreshEmployees', handleRefreshEmployees);
+      window.removeEventListener('employeeAdded', handleEmployeeAdded);
+      window.removeEventListener('applicantStatusChange', handleApplicantStatusChange);
+    };
+  }, [currentOrg, loadEmployees]);
 
   const filteredEmployees = employeeList.filter((employee) => {
     return (

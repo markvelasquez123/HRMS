@@ -6,6 +6,7 @@ const MainCards = () => {
   const [employeeCount, setEmployeeCount] = useState(0);
   const [applicantCount, setApplicantCount] = useState(0);
   const [poolCount, setPoolCount] = useState(0);
+  const [ofwCount, setOfwCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [currentOrg, setCurrentOrg] = useState('');
 
@@ -54,7 +55,7 @@ const MainCards = () => {
         
         console.log("Fetching counts for organization:", currentOrg);
         
-        // Fetch employees with org parameter (THIS WAS MISSING!)
+       
         const employeeResponse = await axios.get(
           `http://localhost/HRMSbackend/test.php?action=get&org=${currentOrg}`,
           {
@@ -74,7 +75,7 @@ const MainCards = () => {
           setEmployeeCount(0);
         }
 
-        // Fetch applicants with org parameter
+    
         const applicantResponse = await axios.get(
           `http://localhost/HRMSbackend/get_applicants.php?org=${currentOrg}`,
           {
@@ -85,7 +86,7 @@ const MainCards = () => {
           }
         );
         
-        // Handle the same response structure as ApplicantPage.js
+   
         if (applicantResponse.data && Array.isArray(applicantResponse.data.summary)) {
           const applicantCount = applicantResponse.data.summary.length;
           setApplicantCount(applicantCount);
@@ -98,7 +99,7 @@ const MainCards = () => {
           setApplicantCount(0);
         }
 
-        // Fetch pool data from the same endpoint as Pool component
+        
         const poolResponse = await axios.get(
           "http://localhost/HRMSbackend/get_pool_data.php",
           {
@@ -109,7 +110,7 @@ const MainCards = () => {
           }
         );
 
-        // Handle pool response structure matching the Pool component
+       
         if (poolResponse.data && poolResponse.data.success && Array.isArray(poolResponse.data.data)) {
           const poolCount = poolResponse.data.data.length;
           setPoolCount(poolCount);
@@ -121,13 +122,37 @@ const MainCards = () => {
           console.warn("Unexpected pool response format:", poolResponse.data);
           setPoolCount(0);
         }
+
+        const ofwResponse = await axios.get(
+          "http://localhost/HRMSbackend/get_ofw.php",
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+      
+        if (ofwResponse.data && ofwResponse.data.success && Array.isArray(ofwResponse.data.data)) {
+          const ofwCount = ofwResponse.data.data.length;
+          setOfwCount(ofwCount);
+          console.log(`OFW count updated: ${ofwCount}`);
+        } else if (ofwResponse.data && !ofwResponse.data.success) {
+          console.warn("OFW API error:", ofwResponse.data.error);
+          setOfwCount(0);
+        } else {
+          console.warn("Unexpected OFW response format:", ofwResponse.data);
+          setOfwCount(0);
+        }
         
       } catch (error) {
         console.error("Error fetching counts:", error);
-        // Set counts to 0 on error to avoid displaying undefined
+        
         setEmployeeCount(0);
         setApplicantCount(0);
         setPoolCount(0);
+        setOfwCount(0);
       } finally {
         setLoading(false);
       }
@@ -139,7 +164,7 @@ const MainCards = () => {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3, 4, 5, 6].map((i) => (
           <div key={i} className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center animate-pulse">
             <div className="h-6 bg-gray-200 rounded w-20 mb-2"></div>
             <div className="h-10 bg-gray-200 rounded w-16"></div>
@@ -153,35 +178,36 @@ const MainCards = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <Link to="/EmployeePage" className="no-underline">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-blue-50 cursor-pointer transition">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-blue-50 cursor-pointer transition h-32">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Employee</h3>
           <span className="text-4xl font-bold text-blue-600">{employeeCount}</span>
         </div>
       </Link>
       <Link to="/ApplicantPage" className="no-underline">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-green-50 cursor-pointer transition">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-green-50 cursor-pointer transition h-32">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Applicant</h3>
-          <span className="text-4xl font-bold text-blue-600">{applicantCount}</span>
+          <span className="text-4xl font-bold text-green-600">{applicantCount}</span>
         </div>
       </Link>
       <Link to="/Pool" className="no-underline">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-purple-50 cursor-pointer transition">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-purple-50 cursor-pointer transition h-32">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Pool</h3>
           <span className="text-4xl font-bold text-purple-600">{poolCount}</span>
         </div>
       </Link>
       <Link to="/OverseasEmployees" className="no-underline">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-red-50 cursor-pointer transition">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-red-50 cursor-pointer transition h-32">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">OFW</h3>
+          <span className="text-4xl font-bold text-red-600">{ofwCount}</span>
         </div>
       </Link>
       <Link to="/Statistics" className="no-underline">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-gray-100 cursor-pointer transition">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-gray-100 cursor-pointer transition h-32">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Statistics</h3>
         </div>
       </Link>
       <Link to="/Settings" className="no-underline">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center hover:bg-gray-100 cursor-pointer transition">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-gray-100 cursor-pointer transition h-32">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Settings</h3>
         </div>
       </Link>

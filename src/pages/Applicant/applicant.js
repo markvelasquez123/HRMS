@@ -34,7 +34,7 @@ const ApplicantPage = () => {
     setLoading(true);
     console.log("Fetching applicants...");
     
-    // Get userData from sessionStorage
+    
     const userDataString = sessionStorage.getItem('userData');
     
     if (!userDataString) {
@@ -45,9 +45,9 @@ const ApplicantPage = () => {
       return;
     }
 
-    // Parse userData JSON
+   
     const userData = JSON.parse(userDataString);
-    const userCompany = userData.Company; // Get Company field
+    const userCompany = userData.Company;
     
     if (!userCompany) {
       setError("User company not found. Please log in again.");
@@ -57,7 +57,6 @@ const ApplicantPage = () => {
       return;
     }
 
-    // Map company name to prefix
     let orgPrefix = '';
     if (userCompany === 'Rigel') {
       orgPrefix = 'RGL';
@@ -75,7 +74,7 @@ const ApplicantPage = () => {
 
     console.log("User Company:", userCompany, "Prefix:", orgPrefix);
     
-    // Send the prefix to backend
+    
     const response = await fetch(`${API_URL}?org=${orgPrefix}`, {
       method: 'GET',
       headers: { "Content-Type": "application/json" },

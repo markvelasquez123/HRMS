@@ -18,7 +18,7 @@ const HomePage = () => {
       </div>
 
       
-      <main className="flex-1 py-10">
+      <main className="flex-1 py-4">
         <MainCards />
       </main>
       

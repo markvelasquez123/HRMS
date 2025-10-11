@@ -1,4 +1,4 @@
-// ProductsList.jsx
+
 import React, { useState, useEffect } from 'react';
 
 export default function ProductsList() {
@@ -11,7 +11,7 @@ export default function ProductsList() {
       const backendURL = process.env.REACT_APP_BACKEND_URL;
       
       try {
-        // Replace the URL below with your actual Firebase Functions URL.
+        
         const response = await fetch(
           `${backendURL}products/discounted`
         );

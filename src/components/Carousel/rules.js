@@ -57,8 +57,8 @@ function OrgChartCarousel() {
     },
     "PeakHR": {
       backgroundImage: peakRule,
-      accentColor: "text-orange-500",
-      borderColor: "border-orange-500",
+      accentColor: "text-orange-700",
+      borderColor: "border-orange-700",
       indicatorColor: "bg-orange-500",
     }
   };
@@ -134,15 +134,15 @@ function OrgChartCarousel() {
   };
 
   return (
-    <div className="w-full py-8">
+    <div className="w-full py-5">
       <div 
         className="relative shadow-xl px-0 py-10 md:px-0 md:py-14 rounded-none w-full"
         style={backgroundStyle}
       >
-        {/* Dark overlay for better text readability */}
+        
         <div className="absolute inset-0 bg-black/40"></div>
 
-        {/* Content wrapper with relative positioning */}
+        
         <div className="relative z-10">
           <div className="flex items-center mb-8 px-8">
             <h5 className="text-4xl font-extrabold text-white tracking-tight">

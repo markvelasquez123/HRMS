@@ -103,7 +103,7 @@ const EmployeeSidebar = ({ employee, onClose, onStatusUpdate }) => {
               </div>
             </div>
 
-            {/* Personal Info */}
+            
             {(employee.birthDate || employee.gender) && (
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
@@ -132,7 +132,7 @@ const EmployeeSidebar = ({ employee, onClose, onStatusUpdate }) => {
               </div>
             )}
 
-            {/* Address */}
+           
             {(employee.street1 || employee.street2 || employee.city || employee.state || employee.zip) && (
               <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
@@ -152,7 +152,7 @@ const EmployeeSidebar = ({ employee, onClose, onStatusUpdate }) => {
               </div>
             )}
 
-            {/* Documents */}
+            
             {(employee.resumeUrl || employee.created_at) && (
               <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
                 <h4 className="font-semibold text-gray-900 mb-3">Additional Information</h4>

@@ -16,7 +16,6 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   const [isOFW, setIsOFW] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   
-  // Interview fields
   const [interviewDate, setInterviewDate] = useState("");
   const [interviewStatus, setInterviewStatus] = useState("");
   const [interviewResult, setInterviewResult] = useState("");
@@ -148,6 +147,14 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
   };
 
   const handleAccept = async () => {
+    console.log('Full applicant object:', applicant);
+    console.log('AppID values:', {
+      AppID: applicant.AppID,
+      appID: applicant.appID,
+      app_id: applicant.app_id,
+      AppId: applicant.AppId
+    });
+
     if (isEmployee) {
       if (!employeeType) return alert("Please select an employment type first");
       if (!department) return alert("Please select a department first");
@@ -162,28 +169,20 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
     try {
       if (isOFW) {
         const ofwData = {
-          FirstName: applicant.FirstName,
-          LastName: applicant.LastName,
-          EmailAddress: applicant.EmailAddress,
-          ContactNumber: applicant.ContactNumber,
-          PositionApplied: applicant.PositionApplied,
+          appID: applicant.AppID || applicant.appID || applicant.app_id || applicant.AppId || '',
+          firstName: applicant.FirstName,
+          lastName: applicant.LastName,
+          middleName: applicant.MiddleName || '',
+          email: applicant.EmailAddress,
+          phone: applicant.ContactNumber,
+          position: applicant.PositionApplied,
           department: "OFW",
           employeeType: "OFW",
           dateHired: new Date().toISOString().split('T')[0],
-          BirthDate: applicant.BirthDate,
-          Gender: applicant.Gender,
-          HomeAddress: applicant.HomeAddress,
-          ProfilePicture: applicant.ProfilePicture,
-          Resume: applicant.Resume,
-          Passport: applicant.Passport,
-          Diploma: applicant.Diploma,
-          Tor: applicant.Tor,
-          Medical: applicant.Medical,
-          TinID: applicant.TinID,
-          NBIClearance: applicant.NBIClearance,
-          PoliceClearance: applicant.PoliceClearance,
-          PagIbig: applicant.PagIbig,
-          PhilHealth: applicant.PhilHealth,
+          birthDate: applicant.BirthDate,
+          gender: applicant.Gender,
+          homeAddress: applicant.HomeAddress,
+          status: "On Process",
           interviewDate,
           interviewStatus,
           interviewResult,
@@ -220,30 +219,38 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         }
 
         if (result.success) {
+          // Delete from applicants table after successful OFW insertion
           try {
             const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
-              body: JSON.stringify({ email: applicant.email })
+              body: JSON.stringify({ 
+                email: applicant.EmailAddress,
+                EmailAddress: applicant.EmailAddress 
+              })
             });
             
             const deleteResponseText = await deleteResult.text();
-            console.log('Delete applicant response:', deleteResponseText);
+            console.log('Delete applicant (OFW) response:', deleteResponseText);
             
             let deleteResponse;
             try {
               deleteResponse = JSON.parse(deleteResponseText);
+              console.log('Parsed delete response:', deleteResponse);
             } catch (parseError) {
               console.error('Delete response parse error:', parseError);
-              deleteResponse = { success: true };
+              console.error('Raw response was:', deleteResponseText);
+              deleteResponse = { success: false };
             }
             
-            if (!deleteResult.ok || !deleteResponse.success) {
-              console.warn('Failed to delete from applicant table, but OFW was added successfully');
+            if (deleteResponse.success) {
+              console.log('✅ Successfully deleted applicant from applicants table');
+            } else {
+              console.warn('⚠️ Failed to delete from applicant table, but OFW was added successfully');
             }
           } catch (deleteError) {
-            console.error('Error deleting from applicant table:', deleteError);
+            console.error('❌ Error deleting from applicant table:', deleteError);
           }
 
           await insertToPool(applicant, 'Accepted as OFW');
@@ -265,13 +272,14 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
             onStatusChange();
           }
           
-          alert("Tanggap ka na");
+          alert("Applicant successfully accepted as OFW!");
           handleClose();
         } else {
           throw new Error(result.message || result.error || 'Failed to accept applicant as OFW');
         }
       } else {
         const employeeData = {
+          AppID: applicant.AppID || applicant.appID || applicant.app_id || applicant.AppId || '',
           FirstName: applicant.FirstName,
           LastName: applicant.LastName,
           EmailAddress: applicant.EmailAddress,
@@ -279,12 +287,13 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
           PositionApplied: applicant.PositionApplied,
           department: department,
           employeeType: employeeType,
-          dateHired: new Date().toISOString(),
+          dateHired: new Date().toISOString().split('T')[0],
           BirthDate: applicant.BirthDate,
           Gender: applicant.Gender,
           HomeAddress: applicant.HomeAddress,
           ProfilePicture: applicant.ProfilePicture,
           Resume: applicant.Resume,
+          Passport: applicant.Passport,
           interviewDate,
           interviewStatus,
           interviewResult,
@@ -321,6 +330,40 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         }
 
         if (result.success) {
+          
+          try {
+            const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ 
+                email: applicant.EmailAddress,
+                EmailAddress: applicant.EmailAddress 
+              })
+            });
+            
+            const deleteResponseText = await deleteResult.text();
+            console.log('Delete applicant (Employee) response:', deleteResponseText);
+            
+            let deleteResponse;
+            try {
+              deleteResponse = JSON.parse(deleteResponseText);
+              console.log('Parsed delete response:', deleteResponse);
+            } catch (parseError) {
+              console.error('Delete response parse error:', parseError);
+              console.error('Raw response was:', deleteResponseText);
+              deleteResponse = { success: false };
+            }
+            
+            if (deleteResponse.success) {
+              console.log('✅ Successfully deleted applicant from applicants table');
+            } else {
+              console.warn('⚠️ Failed to delete from applicant table, but Employee was added successfully');
+            }
+          } catch (deleteError) {
+            console.error('❌ Error deleting from applicant table:', deleteError);
+          }
+
           setStatus("Accepted");
           
           await insertToPool(applicant, 'Accepted');
@@ -374,9 +417,23 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ EmailAddress: applicant.EmailAddress })
+        body: JSON.stringify({ 
+          email: applicant.EmailAddress,
+          EmailAddress: applicant.EmailAddress 
+        })
       });
-      const deleteResponse = await deleteResult.json();
+      
+      const deleteResponseText = await deleteResult.text();
+      console.log('Delete applicant (Reject) response:', deleteResponseText);
+      
+      let deleteResponse;
+      try {
+        deleteResponse = JSON.parse(deleteResponseText);
+      } catch (parseError) {
+        console.error('Delete response parse error:', parseError);
+        deleteResponse = { success: false };
+      }
+      
       if (!deleteResult.ok || !deleteResponse.success) {
         throw new Error(deleteResponse.message || 'Failed to delete applicant from database.');
       }
