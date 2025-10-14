@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { URL } from "../../constant.js";
 
 const MainCards = () => {
   const [employeeCount, setEmployeeCount] = useState(0);
@@ -57,7 +58,8 @@ const MainCards = () => {
         
        
         const employeeResponse = await axios.get(
-          `http://localhost/HRMSbackend/test.php?action=get&org=${currentOrg}`,
+          `http://${URL}/HRMSbackend/test.php?action=get&org=${currentOrg}`
+,
           {
             headers: {
               "Content-Type": "application/json",
@@ -77,7 +79,8 @@ const MainCards = () => {
 
     
         const applicantResponse = await axios.get(
-          `http://localhost/HRMSbackend/get_applicants.php?org=${currentOrg}`,
+          `http://${URL}/HRMSbackend/get_applicants.php?action=get&org=${currentOrg}`
+,
           {
             headers: {
               "Content-Type": "application/json",
@@ -101,14 +104,19 @@ const MainCards = () => {
 
         
         const poolResponse = await axios.get(
-          "http://localhost/HRMSbackend/get_pool_data.php",
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            withCredentials: true,
-          }
-        );
+  `http://${URL}/HRMSbackend/get_pool_data.php`,
+  {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    params: {
+      action: 'get',
+      org: currentOrg,
+    },
+    withCredentials: true,
+  }
+);
+
 
        
         if (poolResponse.data && poolResponse.data.success && Array.isArray(poolResponse.data.data)) {
@@ -124,7 +132,7 @@ const MainCards = () => {
         }
 
         const ofwResponse = await axios.get(
-          "http://localhost/HRMSbackend/get_ofw.php",
+          `http://${URL}/HRMSbackend/get_ofw.php`,
           {
             headers: {
               "Content-Type": "application/json",

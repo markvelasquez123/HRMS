@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Check, ChevronDown, FileText, User, Phone, Mail, MapPin, Cake, Briefcase, Building, Calendar, ClipboardList, CheckCircle, XCircle, Edit } from "lucide-react";
 import EditApplicantModal from './EditApplicant';
-
+import { URL } from "../../constant.js";
 const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange }) => {
   const [visible, setVisible] = useState(false);
   const [applicant, setApplicant] = useState(initialApplicant);
@@ -33,7 +33,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('http://localhost/HRMSbackend/get_applicants.php', {
+        const res = await fetch(`http://${URL}/HRMSbackend/get_applicants.php`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
@@ -107,7 +107,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
       console.log('Sending pool data:', poolData);
 
-      const response = await fetch('http://localhost/HRMSbackend/pool.php', {
+      const response = await fetch(`http://${URL}/HRMSbackend/pool.php`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
         console.log('OFW Data being sent:', ofwData);
 
-        const response = await fetch('http://localhost/HRMSbackend/add_ofw.php', {
+        const response = await fetch(`http://${URL}/HRMSbackend/add_ofw.php`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -221,7 +221,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         if (result.success) {
           // Delete from applicants table after successful OFW insertion
           try {
-            const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
+            const deleteResult = await fetch(`http://${URL}/HRMSbackend/delete_applicant.php`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
@@ -301,7 +301,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
 
         console.log('Sending employee data:', employeeData);
 
-        const response = await fetch('http://localhost/HRMSbackend/accept_applicant.php', {
+        const response = await fetch(`http://${URL}/HRMSbackend/accept_applicant.php`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -332,7 +332,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         if (result.success) {
           
           try {
-            const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
+            const deleteResult = await fetch(`http://${URL}/HRMSbackend/delete_applicant.php`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
@@ -413,7 +413,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
         alert(`Warning: Failed to add to pool table: ${poolResult.error}. Continuing with rejection...`);
       }
 
-      const deleteResult = await fetch('http://localhost/HRMSbackend/delete_applicant.php', {
+      const deleteResult = await fetch(`http://${URL}/HRMSbackend/delete_applicant.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -471,7 +471,7 @@ const ApplicantSidebar = ({ applicant: initialApplicant, onClose, onStatusChange
     if (applicant?.ProfilePicture) {
       const avatarUrl = applicant.ProfilePicture.startsWith('http') 
         ? applicant.ProfilePicture
-        : `http://localhost/HRMSbackend/${applicant.ProfilePicture}`;
+        : `http://"+ URL +"/HRMSbackend/${applicant.ProfilePicture}`;
       
       return (
         <div className="flex justify-center">

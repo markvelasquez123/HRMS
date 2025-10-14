@@ -1,6 +1,6 @@
 import React, { useState, useReducer } from "react";
 import { X, AlertCircle } from "lucide-react";
-
+import { URL } from "../../constant.js"
 const initialFormState = {
   FirstName: "",
   MiddleName: "",
@@ -180,7 +180,7 @@ const AddApplicantForm = ({ onClose, onSuccess }) => {
     });
 
     try {
-      const response = await fetch("http://localhost/HRMSbackend/applicant.php", {
+      const response = await fetch(`http://${URL}/HRMSbackend/applicant.php`, {
         method: "POST",
         body: submitFormData,
       });

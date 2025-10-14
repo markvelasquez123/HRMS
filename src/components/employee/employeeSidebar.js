@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { X, Download, FileText, User, Phone, Mail, MapPin, Briefcase, Calendar, CheckCircle, AlertCircle, Clock, Shield, Edit, Cake, Building } from "lucide-react";
 import EditEmployeeModal from './EditEmployee';
-
-const UPDATE_API_URL = "http://localhost/HRMSbackend/update_employee.php";
-const RETIRE_API_URL = "http://localhost/HRMSbackend/retire_employee.php";
+import { URL } from "../../constant.js";
+const UPDATE_API_URL = `http://${URL}/HRMSbackend/update_employee.php`;
+const RETIRE_API_URL = `http://${URL}/HRMSbackend/retire_employee.php`;
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return "N/A";
@@ -40,7 +40,7 @@ const EmployeeSidebar = ({ employee: initialEmployee, onClose, onEmployeeRemoved
     if (currentEmployee?.ProfilePicture) {
       return (
         <img 
-          src={`http://localhost/HRMSbackend/uploads/${currentEmployee.ProfilePicture}`} 
+          src={"http://"+ URL +"/HRMSbackend/uploads/${currentEmployee.ProfilePicture}"} 
           alt={`${currentEmployee.FirstName} ${currentEmployee.LastName}`} 
           className="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-white" 
         />
@@ -146,7 +146,7 @@ const EmployeeSidebar = ({ employee: initialEmployee, onClose, onEmployeeRemoved
 
   const renderFileLink = (url) => {
     if (url) {
-      const fullUrl = `http://localhost/HRMSbackend/uploads/${url}`;
+      const fullUrl = "http://"+ URL +"/HRMSbackend/uploads/${url}";
       return (
         <a 
           href={fullUrl} 

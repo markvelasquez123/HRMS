@@ -76,4 +76,6 @@ function App() {
   );
 }
 
+export const URL = '192.168.0.217';
+
 export default App;

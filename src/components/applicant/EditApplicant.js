@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, User, Mail, Phone, MapPin, Briefcase, Cake } from "lucide-react";
-
+import { URL } from "../../constant.js";
 const EditApplicantModal = ({ applicant, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     FirstName: applicant?.FirstName || "",
@@ -41,7 +41,7 @@ const EditApplicantModal = ({ applicant, onClose, onUpdate }) => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost/HRMSbackend/editapplicant.php', {
+      const response = await fetch(`http://${URL}/HRMSbackend/editapplicant.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

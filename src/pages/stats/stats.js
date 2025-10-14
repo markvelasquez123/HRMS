@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-
+import { URL } from "../../constant";
 export default function ApplicantCharts() {
   const [applicantCount, setApplicantCount] = useState(0);
   const [acceptedCount, setAcceptedCount] = useState(0);
@@ -24,13 +24,46 @@ export default function ApplicantCharts() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [removedEmployees, setRemovedEmployees] = useState([]);
+  const [userCompany, setUserCompany] = useState("");
 
   const poolColors = ['#2196F3', '#4CAF50', '#F44336', '#9C27B0'];
   const employeeColors = ['#FF9800', '#2196F3', '#4CAF50'];
+
+
+  useEffect(() => {
+    const checkSessionStorage = () => {
+      const userDataString = sessionStorage.getItem('userData');
+      if (userDataString) {
+        try {
+          const userData = JSON.parse(userDataString);
+          const companyFromSession = userData.Company;
+          
+          console.log("=== USER COMPANY FROM SESSION ===");
+          console.log("Company:", companyFromSession);
+          
+          if (companyFromSession && companyFromSession !== userCompany) {
+            setUserCompany(companyFromSession);
+          }
+        } catch (error) {
+          console.error("Error parsing userData:", error);
+        }
+      }
+    };
+    
+    checkSessionStorage();
+    
+    // Check periodically in case userData is set after component mount
+    const interval = setInterval(checkSessionStorage, 100);
+    
+    // Clear interval after 5 seconds
+    setTimeout(() => clearInterval(interval), 5000);
+    
+    return () => clearInterval(interval);
+  }, [userCompany]);
  
   const fetchEmployeesFromBackend = async () => {
     try {
-      const response = await fetch('http://localhost/HRMSbackend/test2.php?action=get');
+      const response = await fetch(`http://${URL}/HRMSbackend/test2.php?action=get`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -44,7 +77,12 @@ export default function ApplicantCharts() {
       }
       
       const employees = await response.json();
-      console.log("Fetched employees from backend:", employees);
+      console.log("=== ALL EMPLOYEES FROM BACKEND ===");
+      console.log("Total employees:", employees.length);
+      if (employees.length > 0) {
+        console.log("Sample employee data:", employees[0]);
+        console.log("Company field check:", employees[0].Company);
+      }
       return employees;
     } catch (error) {
       console.error("Error fetching employees from backend:", error);
@@ -57,7 +95,7 @@ export default function ApplicantCharts() {
     setError("");
     try {
       const response = await fetch(
-        "http://localhost/HRMSbackend/get_pool_data.php",
+        `http://${URL}/HRMSbackend/get_pool_data.php`,
         {
           method: 'GET',
           headers: { "Content-Type": "application/json" },
@@ -78,13 +116,16 @@ export default function ApplicantCharts() {
         department: record.department || 'N/A',
         phone: record.phone || 'N/A',
         status: record.status || 'N/A',
+        company: record.company || record.Company || 'N/A',
         resignedAt: record.resigned_date,
         created_at: record.created_at,
         updated_at: record.updated_at
       }));
 
+      console.log("=== ALL POOL DATA (NOT FILTERED) ===");
+      console.log("Total pool records:", poolRecords.length);
+
       setPoolData(poolRecords);
-      console.log("Pool data loaded:", poolRecords.length, "records");
       
     } catch (error) {
       console.error("Error fetching pool data:", error);
@@ -149,12 +190,31 @@ export default function ApplicantCharts() {
     try {
       const backendEmployees = await fetchEmployeesFromBackend();
       
-      const activeEmployees = backendEmployees.filter(employee => 
+      console.log("=== EMPLOYEE FILTERING ===");
+      console.log("User Company:", userCompany);
+      console.log("Total employees before filter:", backendEmployees.length);
+      
+      // Filter by company if userCompany is set
+      let filteredEmployees = backendEmployees;
+      if (userCompany) {
+        filteredEmployees = backendEmployees.filter(employee => {
+          const empCompany = employee.Company || employee.company;
+          const matches = empCompany === userCompany;
+          if (!matches && employee.id <= 3) {
+            console.log(`Employee ${employee.id}: ${empCompany} !== ${userCompany}`);
+          }
+          return matches;
+        });
+        console.log(`After company filter (${userCompany}): ${filteredEmployees.length} employees`);
+      }
+      
+      const activeEmployees = filteredEmployees.filter(employee => 
         !removedEmployees.includes(employee.id?.toString() || employee.uid)
       );
       
+      console.log("Active employees after removal filter:", activeEmployees.length);
+      
       setEmployeeList(activeEmployees);
-      console.log("Active employees:", activeEmployees);
 
       const q1List = countQuarterlyData(activeEmployees, 2025, 1);
       const q2List = countQuarterlyData(activeEmployees, 2025, 2);
@@ -208,6 +268,8 @@ export default function ApplicantCharts() {
         }
       });
 
+      console.log("Department counts:", departmentCount);
+
       setDepartmentData(Object.entries(departmentCount).map(([name, count]) => ({ name, count })));
 
       if (selectedYear === 2025) {
@@ -232,6 +294,14 @@ export default function ApplicantCharts() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!userCompany) {
+        console.log("Waiting for userCompany...");
+        return;
+      }
+      
+      console.log("=== STARTING DATA FETCH ===");
+      console.log("Fetching data for company:", userCompany);
+      
       try {
         await fetchPoolData();
         await fetchEmployees();
@@ -243,15 +313,17 @@ export default function ApplicantCharts() {
 
     fetchData();
 
-    const interval = setInterval(() => {
-      fetchEmployees();
-      if (new Date().getFullYear() >= 2026) {
-        setRetentionData(getRetentionData());
-      }
-    }, 30000);
+    if (userCompany) {
+      const interval = setInterval(() => {
+        fetchEmployees();
+        if (new Date().getFullYear() >= 2026) {
+          setRetentionData(getRetentionData());
+        }
+      }, 30000);
 
-    return () => clearInterval(interval);
-  }, [selectedYear]);
+      return () => clearInterval(interval);
+    }
+  }, [selectedYear, userCompany]);
 
   useEffect(() => {
     if (poolData.length > 0) {
@@ -259,7 +331,12 @@ export default function ApplicantCharts() {
       setAcceptedCount(poolData.filter(a => a.status === "Accepted").length);
       setRejectedCount(poolData.filter(a => a.status === "Rejected").length);
       setResignedCount(poolData.filter(a => a.status === "Resigned").length);
-      fetchEmployees();
+      
+      console.log("=== POOL STATISTICS ===");
+      console.log("Total:", poolData.length);
+      console.log("Accepted:", poolData.filter(a => a.status === "Accepted").length);
+      console.log("Rejected:", poolData.filter(a => a.status === "Rejected").length);
+      console.log("Resigned:", poolData.filter(a => a.status === "Resigned").length);
     }
   }, [poolData]);
 
@@ -312,7 +389,9 @@ export default function ApplicantCharts() {
 
   return (
     <div className="flex flex-col w-full p-6 bg-gray-50">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Statistics Dashboard</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Statistics Dashboard</h1>
+      </div>
       
       {loading && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">

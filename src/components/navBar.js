@@ -4,7 +4,7 @@ import Logo1 from "../assets/Mainlogo.png";
 import Logo3 from "../assets/Peaklogo.png";
 import Logo2 from "../assets/Rigellogo.png";
 import { Link } from "react-router-dom";
-
+import { URL } from "../constant.js";
 const Navbar = ({ toggleSidebar }) => {
   const [profilePic, setProfilePic] = useState("https://i.pinimg.com/736x/93/44/ee/9344ee2e15ea931f5ecbe2b70df8b5ab.jpg");
   const [showModal, setShowModal] = useState(false);
@@ -65,7 +65,7 @@ const Navbar = ({ toggleSidebar }) => {
 
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost/HRMSbackend/test3.php", {
+      const response = await fetch(`http://${URL}/HRMSbackend/test3.php`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include"
@@ -81,7 +81,7 @@ const Navbar = ({ toggleSidebar }) => {
           sessionStorage.setItem('userData', JSON.stringify(user));
           
           if (user.ProfilePicture) {
-            setProfilePic(`http://localhost/HRMSbackend/uploads/${user.ProfilePicture}`);
+            setProfilePic(`http://${URL}/HRMSbackend/uploads/${user.ProfilePicture}`)
           }
         } else {
           console.warn("No user found with email:", EmailAddress);
@@ -101,7 +101,7 @@ const Navbar = ({ toggleSidebar }) => {
 
   const getAvatarDisplay = () => {
     if (userData?.ProfilePicture) {
-      return <img src={`http://localhost/HRMSbackend/uploads/${userData.ProfilePicture}`} alt={`${userData.FirstName} ${userData.LastName}`} className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto" />;
+      return <img src={`http://${URL}/HRMSbackend/uploads/${userData.ProfilePicture}`} alt={`${userData.FirstName} ${userData.LastName}`} className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto" />;
     }
     return (
       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-4 ring-gray-100 mx-auto">

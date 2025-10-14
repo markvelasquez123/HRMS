@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import peakRule from "./peakrule.jpg";
 import rigelRule from "./rigelrule.jpg";
 import asnrule from "./asnrule.jpg";
+import { URL } from "../../constant.js";
 
 function OrgChartCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -66,7 +67,7 @@ function OrgChartCarousel() {
   const currentTheme = companyThemes[Company] || companyThemes["Asia Navis"];
 
   const getRules = () => {
-    fetch("http://localhost/HRMSbackend/rules.php")
+    fetch(`http://${URL}/HRMSbackend/rules.php`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

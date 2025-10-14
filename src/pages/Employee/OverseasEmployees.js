@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Search, Eye, User, X, Mail, Phone, Briefcase, Building, Cake, MapPin, Calendar, ChevronDown, CreditCard } from "lucide-react";
 import importExcel from "../../components/Excelimport/importExcel";
+import { URL } from "../../constant.js";
 const EmployeeSidebar = ({ employee, onClose, onStatusUpdate }) => {
   const [visible, setVisible] = useState(false);
 
@@ -14,7 +15,7 @@ const EmployeeSidebar = ({ employee, onClose, onStatusUpdate }) => {
   const getAvatarDisplay = () => {
     if (employee?.ProfilePicture) {
       return <img 
-        src={`http://localhost/HRMSbackend/uploads/${employee.ProfilePicture}`} 
+        src={`http://${URL}/HRMSbackend/uploads/${employee.ProfilePicture}`}
         alt={`${employee.firstName} ${employee.lastName}`} 
         className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto"
         onError={(e) => {
@@ -320,7 +321,7 @@ const StatusDropdown = ({ employee, onStatusUpdate }) => {
   const handleStatusChange = async (newStatus) => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost/HRMSbackend/statusofw.php', {
+      const response = await fetch(`http://${URL}/HRMSbackend/statusofw.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -331,6 +332,7 @@ const StatusDropdown = ({ employee, onStatusUpdate }) => {
           status: newStatus
         })
       });
+;
 
       const result = await response.json();
       
@@ -398,7 +400,7 @@ const OverseasEmployees = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost/HRMSbackend/get_ofw.php");
+     const res = await fetch(`http://${URL}/HRMSbackend/get_ofw.php`);
       const data = await res.json();
 
       if (data.success) {
@@ -457,7 +459,7 @@ const OverseasEmployees = () => {
       return employee.profilePicture;
     }
     
-    return `http://localhost/HRMSbackend/uploads/${employee.profilePicture}`;
+    return `http://${URL}/HRMSbackend/uploads/${employee.profilePicture}`;
   };
 
   if (loading) return (

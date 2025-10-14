@@ -1,6 +1,6 @@
 import React, { useState, useReducer } from "react";
 import { X, AlertCircle } from "lucide-react";
-
+import { URL } from "../../constant.js";
 const initialFormState = {
   FirstName: "", MiddleName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
   EmailAddress: "", ContactNumber: "", Gender: "", EmployeeType: "", Company: "",
@@ -130,7 +130,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
     });
     
     try {
-      const response = await fetch("http://localhost/HRMSbackend/test2.php", {
+      const response = await fetch(`http://${URL}/HRMSbackend/test2.php`, {
         method: 'POST',
         body: submitFormData
       });
@@ -149,7 +149,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
       if (result.success) {
         if (isChecked) {
           try {
-            const signupResp = await fetch("http://localhost/HRMSbackend/signup.php", {
+            const signupResp = await fetch("http://"+ URL +"/HRMSbackend/signup.php", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",

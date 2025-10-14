@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { URL } from "../../constant.js";
 
 function PositionDropdown({ onPositionChange }) { 
     const [positions, setPositions] = useState([]);
@@ -12,7 +12,7 @@ function PositionDropdown({ onPositionChange }) {
             try {
                 
     
-                const response = await axios.get('http://localhost/HRMSbackend/get_distinct_positions.php'); 
+                const response = await axios.get(`http://${URL}/HRMSbackend/get_distinct_positions.php`);
                 setPositions(response.data.positions);
             } catch (err) {
                 setError("Failed to fetch positions: " + err.message);

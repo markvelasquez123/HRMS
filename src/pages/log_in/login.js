@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./logIn.css";
 import MainLogo from "../../assets/Mainlogo.png";
+import { URL } from "../../constant.js";
 
 const LoginPage = () => {
   const [name, setName] = useState("");
@@ -59,8 +60,9 @@ const LoginPage = () => {
 
     try {
       const endpoint = isSignUp
-        ? "http://localhost/HRMSbackend/signup.php"
-        : "http://localhost/HRMSbackend/login.php";
+        ? `http://${URL}/HRMSbackend/signup.php`
+        // : "http://localhost/HRMSbackend/login.php";
+        : `http://${URL}/HRMSbackend/login.php`;
 
       const body = isSignUp
         ? {

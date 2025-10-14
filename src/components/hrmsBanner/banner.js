@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 export default function HRMSBanner() {
   const [Company, setCompany] = useState("");
 
@@ -7,22 +6,22 @@ export default function HRMSBanner() {
     const updateCompany = () => {
       try {
         const userData = JSON.parse(sessionStorage.getItem('userData'));
-        const newCompany = userData?.Company || "";  // Remove .toLowerCase()
+        const newCompany = userData?.Company || "";  
         setCompany(newCompany);
       } catch (e) {
         setCompany("");
       }
     };
 
-    // Initial load
+  
     updateCompany();
 
-    // binabasa every 1ms ang sessionStorage
+   
     const pollInterval = setInterval(() => {
       updateCompany();
     }, 1);
 
-    // Listen for custom event (for same tab updates)
+
     const handleCompanyChange = () => {
       updateCompany();
     };

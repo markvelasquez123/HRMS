@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, User, Mail, Phone, MapPin, Briefcase, Cake, Building, Calendar } from "lucide-react";
-
+import { URL } from "../../constant.js";
 const EditEmployeeModal = ({ employee, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     FirstName: employee?.FirstName || "",
@@ -45,7 +45,7 @@ const EditEmployeeModal = ({ employee, onClose, onUpdate }) => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost/HRMSbackend/editemployee.php', {
+      const response = await fetch(`http://${URL}/HRMSbackend/editemployee.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

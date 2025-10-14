@@ -3,8 +3,10 @@ import { FaSearch, FaUser } from "react-icons/fa";
 import ApplicantSidebar from "../../components/applicant/applicantSidebar";
 import importExcel from "../../components/Excelimport/importExcel"; 
 import PositionDropdown from "../../components/applicant/PositionDropdown";
-import AddApplicant from "../../components/applicant/AddApplicantForm"
-const API_URL = "http://localhost/HRMSbackend/get_applicants.php";
+import AddApplicant from "../../components/applicant/AddApplicantForm";
+import {URL} from "../../constant.js";
+const API_URL = `http://${URL}/HRMSbackend/get_applicants.php`;
+
 
 const ApplicantPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -193,7 +195,7 @@ const ApplicantPage = () => {
     if (applicant?.ProfilePicture && applicant.ProfilePicture.trim() !== '' && !hasError) {
       const avatarUrl = applicant.ProfilePicture.startsWith('http') 
         ? applicant.ProfilePicture 
-        : `http://localhost/HRMSbackend/${applicant.ProfilePicture}`;
+        : `http://${URL}/HRMSbackend/${applicant.ProfilePicture}`;
       return (
         <div className="relative">
           <img 

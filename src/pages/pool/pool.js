@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import { URL } from "../../constant.js"
 const Pool = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [poolData, setPoolData] = useState([]);
@@ -28,7 +28,7 @@ const Pool = () => {
     try {
       
       const response = await axios.get(
-        "http://localhost/HRMSbackend/get_pool_data.php",
+        `http://${URL}/HRMSbackend/get_pool_data.php`,
         {
           headers: {
             "Content-Type": "application/json",
