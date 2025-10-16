@@ -27,6 +27,8 @@ const MainCards = () => {
           orgPrefix = 'ASN';
         } else if (userCompany === 'PeakHR') {
           orgPrefix = 'PHR';
+        } else if (userCompany === 'Admin') {
+          orgPrefix = 'Admin';
         }
         
       
@@ -56,10 +58,9 @@ const MainCards = () => {
         
         console.log("Fetching counts for organization:", currentOrg);
         
-       
+        // Employee count
         const employeeResponse = await axios.get(
-          `http://${URL}/HRMSbackend/test.php?action=get&org=${currentOrg}`
-,
+          `http://${URL}/HRMSbackend/test.php?action=get&org=${currentOrg}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -77,10 +78,9 @@ const MainCards = () => {
           setEmployeeCount(0);
         }
 
-    
+        // Applicant count
         const applicantResponse = await axios.get(
-          `http://${URL}/HRMSbackend/get_applicants.php?action=get&org=${currentOrg}`
-,
+          `http://${URL}/HRMSbackend/get_applicants.php?action=get&org=${currentOrg}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -102,20 +102,20 @@ const MainCards = () => {
           setApplicantCount(0);
         }
 
-        
+        // Pool count
         const poolResponse = await axios.get(
-  `http://${URL}/HRMSbackend/get_pool_data.php`,
-  {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    params: {
-      action: 'get',
-      org: currentOrg,
-    },
-    withCredentials: true,
-  }
-);
+          `http://${URL}/HRMSbackend/get_pool_data.php`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            params: {
+              action: 'get',
+              org: currentOrg,
+            },
+            withCredentials: true,
+          }
+        );
 
 
        
@@ -131,11 +131,15 @@ const MainCards = () => {
           setPoolCount(0);
         }
 
+        // OFW count
         const ofwResponse = await axios.get(
           `http://${URL}/HRMSbackend/get_ofw.php`,
           {
             headers: {
               "Content-Type": "application/json",
+            },
+            params: {
+              org: currentOrg,
             },
             withCredentials: true,
           }

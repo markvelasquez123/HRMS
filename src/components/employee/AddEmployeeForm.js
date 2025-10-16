@@ -1,6 +1,7 @@
 import React, { useState, useReducer } from "react";
 import { X, AlertCircle } from "lucide-react";
 import { URL } from "../../constant.js";
+
 const initialFormState = {
   FirstName: "", MiddleName: "", LastName: "", Birthdate: "", PositionApplied: "", Department: "", DateHired: "",
   EmailAddress: "", ContactNumber: "", Gender: "", EmployeeType: "", Company: "",
@@ -41,6 +42,7 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const departments = ["PMS", "Accounting", "Technical", "Admin", "Utility", "HR", "IT", "Marketing", "Engineering", "Architect", "Operation", "Director"];
+  const companies = ["Asia Navis", "Rigel", "PeakHR"];
   const basicFields = ["FirstName", "MiddleName", "LastName", "Birthdate", "PositionApplied", "Department", "DateHired", "Gender", "EmployeeType", "Company", "Passport"];
   const contactFields = ["EmailAddress", "ContactNumber"];
   const addressFields = ["HomeAddress"];
@@ -154,14 +156,14 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
               headers: { "Content-Type": "application/json" },
               credentials: "include",
               body: JSON.stringify({
-  FirstName: formData.FirstName,
-  MiddleName: formData.MiddleName,
-  LastName: formData.LastName,
-  email: formData.EmailAddress,
-  password: "123123",
-  company: formData.Company,
-  dateHired: formData.DateHired  // Add this line
-})
+                FirstName: formData.FirstName,
+                MiddleName: formData.MiddleName,
+                LastName: formData.LastName,
+                email: formData.EmailAddress,
+                password: "123123",
+                company: formData.Company,
+                dateHired: formData.DateHired
+              })
             });
             if (!signupResp.success) {
               console.error("Signup failed:", signupResp.message);
@@ -232,12 +234,18 @@ const AddEmployeeForm = ({ onClose, onSuccess }) => {
       return (
         <div key={field} className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Company *</label>
-          <select {...commonProps}>
-            <option value="">Select Company</option>
-            <option value="Asia Navis">Asia Navis</option>
-            <option value="Rigel">Rigel</option>
-            <option value="PeakHR">PeakHR</option>
-          </select>
+          <input
+            {...commonProps}
+            type="text"
+            list="company-list"
+            placeholder="Type or select a company"
+            autoComplete="off"
+          />
+          <datalist id="company-list">
+            {companies.map(company => (
+              <option key={company} value={company} />
+            ))}
+          </datalist>
         </div>
       );
     }

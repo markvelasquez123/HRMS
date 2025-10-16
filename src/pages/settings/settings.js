@@ -216,6 +216,11 @@ export default function SettingsPage() {
   };
 
   const handleConfirmDeactivate = async () => {
+    if (!isVerified) {
+      showToast("Please verify your Company ID first.", "error");
+      return;
+    }
+
     if (!profile.oldPassword) {
       showToast("Please enter your password to deactivate your account.", "error");
       return;
@@ -228,7 +233,7 @@ export default function SettingsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          companyId: profile.companyId,
+          companyId: verificationCompanyId,
           password: profile.oldPassword
         })
       });
@@ -257,6 +262,11 @@ export default function SettingsPage() {
   };
 
   const handleConfirmDelete = async () => {
+    if (!isVerified) {
+      showToast("Please verify your Company ID first.", "error");
+      return;
+    }
+
     if (!profile.oldPassword) {
       showToast("Please enter your password to delete your account.", "error");
       return;
@@ -269,7 +279,7 @@ export default function SettingsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          companyId: profile.companyId,
+          companyId: verificationCompanyId,
           password: profile.oldPassword
         })
       });
@@ -493,6 +503,41 @@ export default function SettingsPage() {
             </div>
             <p className="text-gray-600 mb-8">Choose to either temporarily deactivate your account or permanently delete it. Please note that account deletion cannot be undone.</p>
 
+            {!isVerified ? (
+              <div className="bg-blue-50 p-6 rounded-xl border border-blue-200 mb-8">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Lock className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-blue-800">Verify Your Identity</h3>
+                </div>
+                <p className="text-blue-700 mb-4">
+                  Please enter your Company ID to verify your identity before deactivating or deleting your account.
+                </p>
+                <div className="flex space-x-4">
+                  <input
+                    type="text"
+                    placeholder="Enter your Company ID (IDNumber)"
+                    value={verificationCompanyId}
+                    onChange={(e) => setVerificationCompanyId(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleVerifyCompanyId()}
+                    className="flex-1 px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <button
+                    onClick={handleVerifyCompanyId}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Verify
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200 mb-8">
+                <p className="text-green-700 font-medium">
+                  ✓ Company ID verified! You can now proceed with account actions. 
+                  <span className="text-sm ml-2">(Verified ID: {verificationCompanyId})</span>
+                </p>
+              </div>
+            )}
+
             <div className="space-y-6">
               <div className="bg-yellow-50 p-6 rounded-xl border border-yellow-200">
                 <h3 className="text-lg font-semibold text-yellow-800 mb-4">Deactivate Account</h3>
@@ -500,7 +545,8 @@ export default function SettingsPage() {
                 {!deactivateConfirmed ? (
                   <button
                     onClick={handleDeactivateAccount}
-                    className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    disabled={!isVerified}
+                    className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
                     Deactivate Account
                   </button>
@@ -530,7 +576,8 @@ export default function SettingsPage() {
                 {!deleteConfirmed ? (
                   <button
                     onClick={handleDeleteAccount}
-                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    disabled={!isVerified}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
                     Delete Account
                   </button>
