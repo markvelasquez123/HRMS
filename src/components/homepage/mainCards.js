@@ -131,31 +131,33 @@ const MainCards = () => {
           setPoolCount(0);
         }
 
-        // OFW count
-        const ofwResponse = await axios.get(
-          `http://${URL}/HRMSbackend/get_ofw.php`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            params: {
-              org: currentOrg,
-            },
-            withCredentials: true,
-          }
-        );
+        // OFW count - only fetch for PeakHR and Admin
+        if (currentOrg === 'PHR' || currentOrg === 'Admin') {
+          const ofwResponse = await axios.get(
+            `http://${URL}/HRMSbackend/get_ofw.php`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              params: {
+                org: currentOrg,
+              },
+              withCredentials: true,
+            }
+          );
 
-      
-        if (ofwResponse.data && ofwResponse.data.success && Array.isArray(ofwResponse.data.data)) {
-          const ofwCount = ofwResponse.data.data.length;
-          setOfwCount(ofwCount);
-          console.log(`OFW count updated: ${ofwCount}`);
-        } else if (ofwResponse.data && !ofwResponse.data.success) {
-          console.warn("OFW API error:", ofwResponse.data.error);
-          setOfwCount(0);
-        } else {
-          console.warn("Unexpected OFW response format:", ofwResponse.data);
-          setOfwCount(0);
+        
+          if (ofwResponse.data && ofwResponse.data.success && Array.isArray(ofwResponse.data.data)) {
+            const ofwCount = ofwResponse.data.data.length;
+            setOfwCount(ofwCount);
+            console.log(`OFW count updated: ${ofwCount}`);
+          } else if (ofwResponse.data && !ofwResponse.data.success) {
+            console.warn("OFW API error:", ofwResponse.data.error);
+            setOfwCount(0);
+          } else {
+            console.warn("Unexpected OFW response format:", ofwResponse.data);
+            setOfwCount(0);
+          }
         }
         
       } catch (error) {
@@ -172,6 +174,9 @@ const MainCards = () => {
 
     fetchCounts();
   }, [currentOrg]); 
+
+  // Check if current user can access OFW
+  const canAccessOFW = currentOrg === 'PHR' || currentOrg === 'Admin';
 
   if (loading) {
     return (
@@ -207,12 +212,14 @@ const MainCards = () => {
           <span className="text-4xl font-bold text-purple-600">{poolCount}</span>
         </div>
       </Link>
-      <Link to="/OverseasEmployees" className="no-underline">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-red-50 cursor-pointer transition h-32">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">OFW</h3>
-          <span className="text-4xl font-bold text-red-600">{ofwCount}</span>
-        </div>
-      </Link>
+      {canAccessOFW && (
+        <Link to="/OverseasEmployees" className="no-underline">
+          <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-red-50 cursor-pointer transition h-32">
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">OFW</h3>
+            <span className="text-4xl font-bold text-red-600">{ofwCount}</span>
+          </div>
+        </Link>
+      )}
       <Link to="/Statistics" className="no-underline">
         <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center hover:bg-gray-100 cursor-pointer transition h-32">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Statistics</h3>

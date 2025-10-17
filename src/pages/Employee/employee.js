@@ -4,6 +4,7 @@ import ExcelImport from "../../components/Excelimport/importExcel";
 import EditEmployeeModal from "../../components/employee/EditEmployee"; 
 import AddEmployee from "../../components/employee/AddEmployeeForm"
 import { URL } from "../../constant.js"
+
 const Alert = ({ type, message, onClose }) => (
   <div className={`fixed top-4 right-4 ${type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : 'bg-green-100 border-green-400 text-green-700'} border px-4 py-3 rounded-lg shadow-lg z-50 max-w-md`}>
     <div className="flex items-start">
@@ -38,7 +39,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
       return (
         <img
           src={`http://${URL}/HRMSbackend/uploads/${currentEmployee.ProfilePicture}`}
-          alt={"${currentEmployee.FirstName} ${currentEmployee.LastName}"}
+          alt={`${currentEmployee.FirstName} ${currentEmployee.LastName}`}
           className="w-16 h-16 rounded-full object-cover ring-4 ring-gray-100 mx-auto"
         />
       );
@@ -127,7 +128,7 @@ const EmployeeSidebar = ({ employee, onClose }) => {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><FileText className="w-4 h-4 mr-2" />Documents</h4>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <a href={"http://"+ URL +"/HRMSbackend/uploads/${currentEmployee.ResumeFile}"} target="_blank" rel="noopener noreferrer"
+                  <a href={`http://${URL}/HRMSbackend/uploads/${currentEmployee.ResumeFile}`} target="_blank" rel="noopener noreferrer"
                     className="flex items-center text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
                     <FileText className="w-4 h-4 mr-2 flex-shrink-0" />View Resume
                   </a>
@@ -173,7 +174,9 @@ const EmployeePage = () => {
         const userCompany = userData.Company;
 
         let orgPrefix = '';
-        if (userCompany === 'Rigel') {
+        if (userCompany === 'Admin') {
+          orgPrefix = 'Admin';
+        } else if (userCompany === 'Rigel') {
           orgPrefix = 'RGL';
         } else if (userCompany === 'Asia Navis') {
           orgPrefix = 'ASN';
@@ -352,7 +355,7 @@ const EmployeePage = () => {
                   title={`Click to view ${employee.FirstName} ${employee.LastName}'s details`}
                 >
                   <td className="px-6 py-4">
-                    <img src={employee.ProfilePicture ? "http://"+ URL +"/HRMSbackend/uploads/${employee.ProfilePicture}" : "https://via.placeholder.com/150"} 
+                    <img src={employee.ProfilePicture ? `http://${URL}/HRMSbackend/uploads/${employee.ProfilePicture}` : "https://via.placeholder.com/150"} 
                       alt={`${employee.FirstName} ${employee.LastName}`} className="h-12 w-12 rounded-full object-cover border-2 border-gray-200" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{employee.IDNumber}</div></td>

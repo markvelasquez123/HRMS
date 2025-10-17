@@ -60,7 +60,9 @@ const ApplicantPage = () => {
     }
 
     let orgPrefix = '';
-    if (userCompany === 'Rigel') {
+    if (userCompany === 'Admin') {
+      orgPrefix = 'Admin';
+    } else if (userCompany === 'Rigel') {
       orgPrefix = 'RGL';
     } else if (userCompany === 'Asia Navis') {
       orgPrefix = 'ASN';

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { URL } from "../../constant";
+
 export default function ApplicantCharts() {
   const [applicantCount, setApplicantCount] = useState(0);
   const [acceptedCount, setAcceptedCount] = useState(0);
@@ -29,7 +30,6 @@ export default function ApplicantCharts() {
   const poolColors = ['#2196F3', '#4CAF50', '#F44336', '#9C27B0'];
   const employeeColors = ['#FF9800', '#2196F3', '#4CAF50'];
 
-
   useEffect(() => {
     const checkSessionStorage = () => {
       const userDataString = sessionStorage.getItem('userData');
@@ -52,10 +52,8 @@ export default function ApplicantCharts() {
     
     checkSessionStorage();
     
-    // Check periodically in case userData is set after component mount
     const interval = setInterval(checkSessionStorage, 100);
     
-    // Clear interval after 5 seconds
     setTimeout(() => clearInterval(interval), 5000);
     
     return () => clearInterval(interval);
@@ -122,7 +120,7 @@ export default function ApplicantCharts() {
         updated_at: record.updated_at
       }));
 
-      console.log("=== ALL POOL DATA (NOT FILTERED) ===");
+      console.log("=== ALL POOL DATA ===");
       console.log("Total pool records:", poolRecords.length);
 
       setPoolData(poolRecords);
@@ -194,9 +192,9 @@ export default function ApplicantCharts() {
       console.log("User Company:", userCompany);
       console.log("Total employees before filter:", backendEmployees.length);
       
-      // Filter by company if userCompany is set
+      // Filter by company if userCompany is set (unless Admin)
       let filteredEmployees = backendEmployees;
-      if (userCompany) {
+      if (userCompany && userCompany !== 'Admin') {
         filteredEmployees = backendEmployees.filter(employee => {
           const empCompany = employee.Company || employee.company;
           const matches = empCompany === userCompany;
@@ -206,6 +204,8 @@ export default function ApplicantCharts() {
           return matches;
         });
         console.log(`After company filter (${userCompany}): ${filteredEmployees.length} employees`);
+      } else if (userCompany === 'Admin') {
+        console.log("Admin user - showing all employees");
       }
       
       const activeEmployees = filteredEmployees.filter(employee => 
@@ -390,7 +390,9 @@ export default function ApplicantCharts() {
   return (
     <div className="flex flex-col w-full p-6 bg-gray-50">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Statistics Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800">
+          Statistics Dashboard
+        </h1>
       </div>
       
       {loading && (
